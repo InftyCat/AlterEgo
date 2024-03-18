@@ -45,24 +45,121 @@ originX = 100
 originY = 100
 maxX = 4
 maxY = 1
-roundcoef = 1/7
+roundcoef = 1/2
+rinv = 1 - roundcoef
+# ALWAYS GO clockwise around the area!
+class Segment :
+    def __init__ (self,_canvas,_x1,_y1,_x2,_y2,_style,_w,_c,_dir):
+        self.x1 = _x1
+        self.x2 = _x2
+        self.y2 =_y2
+        self.y1 = _y1
+        self.style = _style
+        self.canvas = _canvas
+        self.w = _w
+        self.c = _c
+        self.dir = _dir
+    def draw(self) :
+        if self.style == "line" :
+            canvas.create_line(self.x1,self.y1,self.x2,self.y2,width = self.w,fill=self.c)
+        else:
+            a = whichArcPos(self.style, self.x1 , self.y1, self.x2,self.y2)
+            
+            if (not a == "") :
+                r = abs(self.x1-self.x2)
+                if (self.style == "DR"):
+                    if a == "SO":
+                        canvas.create_circle_arcDR(self.x2,self.y2,r,outline=self.c,width=self.w)        
+                    if a == "NW":
+                        canvas.create_circle_arcDR(self.x1,self.y1,r,outline=self.c,width=self.w)        
+                else :
+                    if a == "NW":
+                        canvas.create_circle_arcUL(self.x1,self.y1,r,outline=self.c,width=self.w)        
+                    if a == "NO":
+                        canvas.create_circle_arcUL(self.x2,self.y2,r,outline=self.c,width=self.w)        
+            else: 
+                    print("radius mismatch!")
+def whichArcPos(style,x1,y1,x2,y2) : 
+   r = x2 - x1
+   r2 = y2 - y1
+   
+   if (abs(r) == abs(r2)) :     
+       if (r > 0 and style == "UL") : return "NW"
+       if (r < 0 and style == "DR" ) : return "SO"
+       if (r < 0 and style =="UL") : return "NO"
+       if (r > 0 and style == "DR") : return "SW"
+
+              
+   else:
+        print("this is not an arc")
+        return ""
+def HoriVertiArc (style,x1,y1,x2,y2):
+    if style == "line":
+        if (y1 == y2) : return "H"
+        if (x1 == x2) : return "V"
+    else:
+        return whichArcPos(style,x1,y1,x2,y2)
+def get_indices(lst, x):
+    return [i for i, element in enumerate(lst) if element == x]
+    
+class Area : 
+     def __init__ (self,_canvas,_c,_w)  :
+         self.canvas = _canvas
+         self.w = _w
+         self.c = _c
+         self.segments = []
+     def create_segments (self,style, *kwargs):
+        
+        segs = [[kwargs[i], kwargs[i+1],kwargs[i+2],kwargs[i+3]] for i in range(0, len(kwargs)-2, 2)]
+        #directs = ["N"]
+        ud = "N"
+        lr = "W"
+        direct = [HoriVertiArc(style,*p) for p in segs]
+        nh = get_indices(direct, "H")
+        nV = get_indices(direct, "V")
+        hlab = [["N","S"],["NW,NO","SO","SW"],["NW,N,NO","SO","S","SW"]]
+        vlab = [["O","W"],["ON,OS","WS","WN"],["ON,O,OS","WS","W","WN"]]
+        nhp = int(len(nh) / 2) - 1
+        nVp = int(len(nV) / 2) - 1
+        
+        for i in range (len(nh)):
+            
+            direct[nh[i]] = hlab[nhp][i]
+        for i in range (len(nV)):
+            direct[nV[i]] = vlab[nVp][i]
+                
+        for i in range(len(segs)) :
+            print("start",i)
+            
+            self.segments.append(Segment(self.canvas,*segs[i],_style=style,_w = self.w,_c = self.c,_dir = direct[i]) )
+        
+     def drawSegments (self):
+        for seg in self.segments :
+            seg.draw()
+        
+                        
 def _createRectDR(self,x,y,width, height,c , w=w) :
     _min= min(width,height)
-    
-    self.create_line(x,y, x+width , y ,x+width, y+ _min/3, width =w,fill=c)
+    a= Area(self,_c=c,_w=w)
+    a.create_segments("line", x,y, x+width , y ,x+width, y+ _min*roundcoef)
+    a.create_segments("DR", x+width, y+ _min*roundcoef,x+ width-(rinv) * _min , y +  height)
+    #a.create_segments(False, x+ width-(rinv) * _min , y +  height,rinv * _min)
+    a.create_segments("line",x+width-rinv * _min , y +  height, x , y + height ,x,y)
+    a.drawSegments()
+    return a
     #canvas.create_arc(x+width/3, y+height/3, width * 2 / 3, style="arc", outline=c, width=6, start=270, end=360)
     #self.create_arc(x-width/3, y-height/3 , x+width , y +  height,start=270,extent = 90 , style="arc", outline=c, width=w) #,x+width, y+ height/3, 
     
-    self.create_circle_arcDR(x+ width-2*_min/3 , y +  height,2/3 * _min,outline=c,width=w)
-    self.create_line(x+width-2*_min/3 , y +  height, x , y + height ,x,y,width =w,fill=c)
+    #self.create_circle_arcDR(,outline=c,width=w)
+    
 def _createRectUL(self,x,y,width, height,c , w=w) :
     _min= min(width,height)
-    
-    self.create_line(x+ 2*_min /3 ,y, x+width , y, x +width , y+ height, x , y + height, x , y +height - _min * 1 / 3, width =w,fill=c)
-    #canvas.create_arc(x+width/3, y+height/3, width * 2 / 3, style="arc", outline=c, width=6, start=270, end=360)
-    #self.create_arc(x-width/3, y-height/3 , x+width , y +  height,start=270,extent = 90 , style="arc", outline=c, width=w) #,x+width, y+ height/3, 
-    
-    self.create_circle_arcUL( x , y +height - _min * 1 / 3,2/3 * _min,outline=c,width=w)
+    a= Area(self,_c=c,_w=w)
+    a.create_segments("line",    x+ rinv*_min ,y, x+width , y, x +width , y+ height, x , y + height, x , y +height - _min * roundcoef)    
+    a.create_segments("UL", x , y +height - _min * roundcoef, x+ rinv*_min ,y)
+    a.drawSegments()
+    return a
+
     
 def _create_circle_arc(self, x, y, r, **kwargs):
     if "start" in kwargs and "end" in kwargs:
