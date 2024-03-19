@@ -39,8 +39,8 @@ canvas.grid()
 def _createRect(self,x,y,width,height,c,w=w) :
     self.create_rectangle(x,y,x+width,y+height,outline=c,width=w)
     
-stdWidth = 300
-stdHeight = 300
+stdWidth = 600
+stdHeight = 400
 originX = 100
 originY = 100
 maxX = 4
@@ -109,7 +109,7 @@ class Area :
          self.c = _c
          self.segments = []
      def create_segments (self,style, *kwargs):
-        
+        #print(kwargs,len(kwargs))
         segs = [[kwargs[i], kwargs[i+1],kwargs[i+2],kwargs[i+3]] for i in range(0, len(kwargs)-2, 2)]
         #directs = ["N"]
         ud = "N"
@@ -129,7 +129,7 @@ class Area :
             direct[nV[i]] = vlab[nVp][i]
                 
         for i in range(len(segs)) :
-            print("start",i)
+            #print("start",i)
             
             self.segments.append(Segment(self.canvas,*segs[i],_style=style,_w = self.w,_c = self.c,_dir = direct[i]) )
         
@@ -151,8 +151,75 @@ def _createRectDR(self,x,y,width, height,c , w=w) :
     #self.create_arc(x-width/3, y-height/3 , x+width , y +  height,start=270,extent = 90 , style="arc", outline=c, width=w) #,x+width, y+ height/3, 
     
     #self.create_circle_arcDR(,outline=c,width=w)
+    """ if (x2 - x1 == y2 - y1) : 
+                if (x2 > x1):
+                    
+                    self.create_segments("line",x1,y1,x1 , y2 , x2 , y2)
+                else :"""
+                    
+                    
+def _createArc(self,x1,y1,x2,y2,style) :     
+   if style == "line":
+        if (x1 == x2 or y1 == y2):
+            self.create_segments("line",x1,y1,x2,y2) # todo
+        else:
+            self.create_segments("line",x1,y1,x1 , y2 , x2 , y2)
+   else:     
+    if style == "DR" : 
+        vorz = -1
+    else :
+        vorz = 1
     
-def _createRectUL(self,x,y,width, height,c , w=w) :
+    if (x1 == x2):
+            r = y2 - y1
+            self.create_segments("line",x1,y1,x1 + r,y1)
+            if style == "DR" :
+                
+                self.create_segments(style,x1,y1 + vorz *r,x1 + r,y1)
+            else :
+                self.create_segments(style,x1 + r,y1,x1,y1 + vorz *r)
+    else :
+            if (x1 > x2) :
+                self.create_segments("DR",x1,y1,x2,y2)
+            else:
+                self.create_segments("UL",x1,y1,x2,y2)
+    
+def _createArea(self,x,y,width,height,c,w,*arcs):
+
+    _min= min(width,height)
+    a= Area(self,_c=c,_w=w)
+    a.create_segments("line",    x+ width - roundcoef*_min ,y, x+width , y)
+    st = "line"
+    if ("NO" in arcs) :
+        st = "UL"
+    a.createArc(x + width , y , x + width , y + _min * roundcoef,st)
+    
+    a.create_segments("line",x + width , y + _min * roundcoef , x + width , y + height - _min * roundcoef)
+    if ("SO" in arcs) :
+        st = "DR"
+    else : 
+        st = "line"
+    a.createArc(x + width , y + height - _min * roundcoef , x +width - _min * roundcoef , y+ height,st)
+    a.create_segments("line",x +width - _min * roundcoef , y+ height, x + _min * roundcoef , y+ height,x,y+height)
+    if ("SW" in arcs) : 
+        st = "DR" 
+    else :
+        st = "line"
+    a.createArc(x  , y+ height , x , y + height - _min * roundcoef,st)
+    a.create_segments("line",x , y +height - _min * roundcoef, x ,y + _min * roundcoef)
+    if ("NW" in arcs):
+        print("jop")
+        st = "UL"
+    else:
+        st = "line"
+    
+    a.createArc( x ,y + _min * roundcoef,x + _min * roundcoef,y,st)
+    a.create_segments("line",x + _min * roundcoef,y,x + width - _min*roundcoef,y)
+    a.drawSegments()
+    return a                    
+            
+            
+def _createRectUL(self,x,y,width, height,c , w) :
     _min= min(width,height)
     a= Area(self,_c=c,_w=w)
     a.create_segments("line",    x+ rinv*_min ,y, x+width , y, x +width , y+ height, x , y + height, x , y +height - _min * roundcoef)    
@@ -173,27 +240,49 @@ def _create_circle_arcUL(self, x, y, r, **kwargs):
     kwargs["extent"] = 90 #kwargs.pop("end") - kwargs["start"]
     return self.create_arc(x, y-r, x+2*r, y+r, start = 90, style="arc", **kwargs)
   
-def _createRect2(self,x,y,c,originX = originX,originY = originY,anzIn = 1, anzOut = 1) :
-    wx = (maxX - x) * w
+def _createRect2(self,x,y,c,originX = originX,originY = originY,anzIn = 1, anzOut = 1,dl = False, ur = False) :
+    wx = (maxX - x) * w 
     k = 0
-    wy = (maxY - y) * w
+    wy = (maxY - y) * w 
+    st = []
     if anzIn == 2 and anzOut == 1 :
-            f = self.createRectUL
+            
+            st = ["NW"] #self.createRectUL
     elif anzIn == 1 and anzOut == 2  :
-            f = self.createRectDR
+            st = ["SO"]
     else :
-            f = self.createRect
-    f(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
+            st= []
+    if dl:
+        st.append("SW")
+    if ur :
+        st.append("NO")            
+    self.createArea(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
                originY + y * (stdHeight / 2) -  w / 2* (x + y),
-               stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),c,wx + wy)
+               stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),c,wx + wy,*st)
 tkr.Canvas.create_circle_arc = _create_circle_arc
 tkr.Canvas.create_circle_arcDR = _create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = _create_circle_arcUL
 tkr.Canvas.createRectUL = _createRectUL 
-
+tkr.Canvas.createArea = _createArea
+Area.createArc = _createArc
 tkr.Canvas.createRect = _createRect
 tkr.Canvas.createRect2 = _createRect2
 tkr.Canvas.createRectDR = _createRectDR
+
+
+
+
+canvas.createRect2(0,0,'green',anzOut=2)
+canvas.createRect2(0,1,'blue',ur=True)
+canvas.createRect2(1,0,'purple',anzOut=2)
+canvas.createRect2(1,1,'red',anzIn=2,ur=True)
+canvas.createRect2(2,0,'cyan',anzOut=2,dl=True)
+canvas.createRect2(2,1,'yellow',anzIn=2)
+canvas.createRect2(3,0,'black',dl=True)
+canvas.createRect2(3,1,'white',anzIn=2)
+
+
+tkr.mainloop()
 """
 canvas.createRectDR(50,50,200,100,"blue")
 canvas.createRectUL(50,250,200,100,"blue")
@@ -202,6 +291,9 @@ canvas.createRect(originX + x * (stdWidth / 2 + 0.5*w) -  w * y,
                stdWidth + 2 * w * y , stdHeight + 2 * w * x,c)
 
 """
+
+"""
+
 
 
 #canvas.create_circle(100, 120, 50, fill="blue", outline="#DDD", width=4)
@@ -217,18 +309,8 @@ canvas.createRect(originX + x * (stdWidth / 2 + 0.5*w) -  w * y,
 #canvas.createRect(50,50,100,200,'green',w=50)
 
 #createRect(250,50 + (- 50 + 20)/2,100 ,200,'green',w=20)
-
-canvas.createRect2(0,0,'green',anzOut=2)
-canvas.createRect2(0,1,'blue')
-canvas.createRect2(1,0,'purple',anzOut=2)
-canvas.createRect2(1,1,'red',anzIn=2)
-canvas.createRect2(2,0,'cyan',anzOut=2)
-canvas.createRect2(2,1,'yellow',anzIn=2)
-canvas.createRect2(3,0,'black')
-canvas.createRect2(3,1,'white',anzIn=2)
-
 #createRectDR(100,100, 300,300,'green')
 #createRectUL(250,250, 300,300,'pink')
 
 
-tkr.mainloop()
+"""
