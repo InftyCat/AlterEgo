@@ -11,7 +11,11 @@ import random
 import Segment
 import World
 import Area
-import State
+from Atom import Hori , Verti, Diag
+from Morphism import Mono, Epi
+import Atom
+import BasicFunctions as Bsc
+
 
 #w =6
 tk = tkr.Tk()
@@ -77,27 +81,42 @@ tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
 
 tkr.Canvas.createArea = Area._createArea        
-wld = World.World(canvas, State.FullOrZeroState((0,0),"Full")) # State.State((0,0), State.Hori, State.Ker)) # State((2,0),State.Hori,State.Im)) # 
+wld = World.World(canvas, Atom.FullOrZeroAtom((0,0),"Full") ) #Atom.Atom((1,1),Atom.Hori,Atom.Im )) # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) # 
 #wld.addArea(0,0)
 def f () :
-    #wld.deleteState()
+    #wld.deleteAtom()
     #canvas.delete(wld.subobject)
-    wld.move(True,State.Hori)
-    #wld.updateState(State.State((0,0), State.Hori, State.Ker))
-    #wld.drawState()
+    wld.move(True,Atom.Hori)
+def b () :
+    wld.move(True,Atom.Verti)
+def ass () :
+    wld.applyAss()    
+    #wld.updateAtom(Atom.Atom((0,0), Atom.Hori, Atom.Ker))
+    #wld.drawAtom()
     
 wld.addMorphism(0, 0,0,1) # ,"Mono")
 wld.addMorphism(0, 0,1,0)
 wld.addMorphism(1,0, 2, 0)
 
 #wld.addArea(x, y)
-wld.addMorphism(1, 0,1,1) # ,"Epi")
+wld.addMorphism(1, 0,1,1,Epi)
 wld.addMorphism(0,1,1,1)
+wld.addMorphism(1,1,2,1)
+
+
+wld.addMorphism(2, 0, 3, 0)
+wld.addMorphism(2,0,2,1)
+
+wld.addMorphism(2, 1, 3, 1)
+wld.addMorphism(3,0,3,1,Mono)
+
 
 wld.initialize()
+
 wld.initSubArea()
 wld.drawAreas()
-wld.drawState()
+wld.drawAtom()
+#wld.areas[(2,0)].generateDirections()
 """
 a00 = canvas.createRect2(0,0,'green' ,anzOut=2)#  ,ur=True,dl=True)
 #a = canvas.createRect2(0,2,'green')
@@ -113,13 +132,35 @@ canvas.createRect2(2,1,'yellow',anzIn=2)
 canvas.createRect2(3,0,'black',dl=True)
 canvas.createRect2(3,1,'white',anzIn=2)
 """
-#print(a.generateDirections())
 
 
 
-but = tkr.Button(frame, text="test", command=f)
+
+but = tkr.Button(frame, text="hori", command=f)
 
 but.grid(row=1,column=0)
+but2 = tkr.Button(frame, text="verti", command=b)
+
+but2.grid(row=1,column=1)
+butAss = tkr.Button(frame,text="Ass" , command=ass)
+butAss.grid(row=1,column = 2)
+chars = ['w','a','s','d','c','q','f','j']
+funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , 
+         lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss]
+def key_pressed(event):
+    
+    r = event.char
+    i = Bsc.get_indices(chars,r) 
+    #print(i,r,r in chars)
+    if (len(i) > 0) :
+        funcs[i[0]]()
+        #print("Key pressed:", )
+
+
+tk.title("Key Listener")
+
+# Bind the key press event to the key_pressed function
+tk.bind("<Key>", key_pressed)
 #but2 = tkr.Button(frame, text="erase", command=wld.)
 
 #but2.grid(row=1,column=0)
