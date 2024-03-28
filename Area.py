@@ -33,7 +33,7 @@ class Area :
                             print("seg append didnt fit")
                     self.segments.append(Segment.Segment(self.canvas,*segs[i],_style=style,_w = self.w,_c = self.c,_glue=glue)) #,_dir = direct[i]) )
      def stealSegment (self,seg) :
-        
+        #print("stealing",seg)
         s = seg.copy()
         s.c = self.c
         s.w = self.w #*= 1.5
@@ -123,13 +123,53 @@ class Area :
          
          self.segments = []
          self.canvas.update()
-     def findAllSegments(self,d):
+     def findAllSegments(self,d,invert=False):
         self.generateDirections()
         ret = []
         for s in self.segments :
-            if (d in Bsc.so(s.dir)):
-                ret.append(s)
+            if invert :
+                if (not (d in Bsc.so(s.dir))) :
+                    ret.append(s)
+            else :
+                if (d in Bsc.so(s.dir)):
+                    ret.append(s)
         return ret
+     def getSegIdxByTrg(self, trg) :
+         l = list(filter (lambda  i : Bsc.comPnts(self.segments[i].trg() , trg) ,  range(len(self.segments))))
+         if (len(l) > 0) :
+             return l[0]
+         else :
+             return -1
+     def getSegIdxBySrc(self, src) :
+           l = list(filter (lambda  i : Bsc.comPnts(self.segments[i].src() , src) ,  range(len(self.segments))))
+           if (len(l) > 0) :
+               return l[0]
+           else :
+               return -1
+     def comp (self, quot) :
+         comp = Area(self.canvas,self.c,self.w * 1.5)
+         i = 0
+         idx = quot.getSegIdxByTrg(self.segments[i].src())
+         #print("i,idx",i,idx)
+         while (idx == -1) :
+             comp.stealSegment(self.segments[i])
+             
+             i += 1
+             idx = quot.getSegIdxByTrg(self.segments[i].src())
+          #   print("i,idx",i,idx)
+         
+         j = self.getSegIdxBySrc(quot.segments[idx].src())
+         #print("j,idx",j,idx)
+         while (j == -1) :
+            comp.stealSegment(quot.segments[idx].invert()) 
+          #  print("j,idx",j,idx)
+            j = self.getSegIdxBySrc(quot.segments[idx].src())
+            idx -= 1
+            
+         for i in range(j,len(self.segments)) :             
+            comp.stealSegment(self.segments[i])
+         return comp
+        
      def exactList(self) :
          a = [Atom.Verti]
          if self.exactHori :
@@ -188,7 +228,8 @@ def _createArc(self,x1,y1,x2,y2,style) :
     
     if (isSpecialArc(style,x1,y1,x2,y2)):
             r = y2 - y1
-            self.create_segments("line",x1,y1,x1 + r,y1,glue="True")
+            #self.segments[-1].glue = True only for kernels
+            self.create_segments("line",x1,y1,x1 + r,y1,glue="True") 
             if style == "DR" :
                 
                 #self.canvas.create_circle_arc(x1,y1 - vorz*r,30,start = 0,end = 359,fill="black")

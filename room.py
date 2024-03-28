@@ -81,7 +81,7 @@ tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
 
 tkr.Canvas.createArea = Area._createArea        
-wld = World.World(canvas, Atom.Atom((1,1),Atom.Hori,Atom.Ker )) # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) # Atom.FullOrZeroAtom((0,0),"Full") ) #
+wld = World.World(canvas,  Atom.Atom((1,0),Atom.Verti,Atom.Ker )) #Atom.Atom((0,1),Atom.Hori,Atom.Ker)) #Atom.FullOrZeroAtom((0,0),"Full") ) # # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) #
 #wld.addArea(0,0)
 def f () :
     #wld.deleteAtom()
@@ -99,12 +99,12 @@ wld.addMorphism(0, 0,1,0)
 wld.addMorphism(1,0, 2, 0)
 
 #wld.addArea(x, y)
-wld.addMorphism(1, 0,1,1,Epi)
+wld.addMorphism(1, 0,1,1,Mono)
 wld.addMorphism(0,1,1,1)
 wld.addMorphism(1,1,2,1)
 
 
-wld.addMorphism(2, 0, 3, 0)
+wld.addMorphism(2, 0, 3, 0,Mono)
 wld.addMorphism(2,0,2,1)
 
 wld.addMorphism(2, 1, 3, 1)
