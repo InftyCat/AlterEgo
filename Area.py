@@ -148,12 +148,14 @@ class Area :
            else :
                return -1
      def comp (self, quot,unc=False) :
+         
          w = self.w * 1.5
          c = self.c
-          
+         #print([str(s) for s in quot.segments])
          if (unc) :
             w = self.w / 2
             c = "black"
+         #unc = False
          comp = Area(self.canvas,c,w )
          i = 0
          idx = quot.getSegIdxByTrg(self.segments[i].src())
@@ -168,11 +170,21 @@ class Area :
          
          j = self.getSegIdxBySrc(quot.segments[idx].src())
          print("j,idx",j,idx)
+         
+         comp.stealSegment(quot.segments[idx].invert()) 
+         #print("j,idx",j,idx)
+         #j = self.getSegIdxBySrc(quot.segments[idx].src())
+         idx -= 1
+            
          while (j == -1) :
+            
             comp.stealSegment(quot.segments[idx].invert()) 
             print("j,idx",j,idx)
             j = self.getSegIdxBySrc(quot.segments[idx].src())
             idx -= 1
+            
+            
+            
          if nunc :
              for i in range(j,len(self.segments)) :             
                 comp.stealSegment(self.segments[i])

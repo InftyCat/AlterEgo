@@ -17,6 +17,7 @@ from State import *
 from Atom import Ker , Im ,  Full , Hori , Verti , Diag
 import Atom
 import Moving
+from Room import *
 originX = 200
 originY = 100
 stdWidth = 300
@@ -134,7 +135,14 @@ class World :
                     
             return img        
     def createker(self,x1,y1,x2,y2,unc = False):
-        return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
+        if (x1,y1) == (x2,y2) :
+           a = self.areas[(x1,y1)]
+           zero = Area.Area(self.canvas,"black", a.w * 0.1 )
+           for s in a.segments :
+               zero.stealSegment(s)
+           return zero
+        else :
+            return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
        
     def genUnc(self,room, unc) :
             if room == unc :
@@ -196,9 +204,17 @@ class World :
     def getUncArea(self) :
         atom = self.subobject()
         (x1,y1) = atom.room
-        (x2,y2) = self.uncertainty().getCoRoom()
-        print("updated uncarea")
-        return self.createker(x1,y1,x2,y2,unc=True)
+        r = self.uncertainty().getUncCoRoom()
+        if r.infty == False :
+            (x2,y2) = r.room
+            print("updated uncarea")
+            return self.createker(x1,y1,x2,y2,unc=True)
+        else :
+            print("uncarea now infty")
+            a = self.areas[(x1,y1)]
+            full = Area.Area(self.canvas,"black",a.w * 2)
+            for s in a.segments : full.stealSegment(s)
+            return full
     def initState(self) : 
         self.subobjectArea = self.getSubArea()
         self.uncertaintyArea = self.getUncArea()
@@ -216,12 +232,15 @@ class World :
     def updateSubobject(self,subobject) :
         print("finding max" , self.uncertainty().getCoRoom() , subobject.room)
         
-        uncRoom =self.uncertainty().wedge(subobject.room)
-        print("uncRoom",uncRoom)
-        if uncRoom != None :
+        r = self.uncertainty().getUncCoRoom()
+        r.wedge(subobject.room)
+        print(r)
+        #print("uncRoom",uncRoom)
+        uncRoom  = r.room
+        if not r.infty :
             self.updateState(newState(self,subobject,uncRoom))
         else :
-            self.updateState(self.canState(subobject))
+            self.updateState(State(self,subobject,genFullUnc(subobject)))
     def move(self,forward, d) :
         
         if forward :

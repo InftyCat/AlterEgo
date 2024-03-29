@@ -7,7 +7,8 @@ Created on Fri Mar 22 14:32:33 2024
 """
 #morphDir = ["Hori","Verti","Diag"]
 import BasicFunctions as Bsc
-Hori = "Hori"
+
+Hori = "Hori" 
 Verti = "Verti"
 Diag = "Diag"
 Ker = "Ker"
@@ -16,6 +17,7 @@ Full = "Full"
 Zero = "Zero"
 Sub = "SUB"
 Unc = "UNC"
+from Room import *
 #Info = ["Ker" , "Im"]
     
 def FullOrZeroAtom (_room , fullOrZero,_genus=Unc) :
@@ -28,14 +30,7 @@ class Atom:
             s = ""
             
         return s +"_" + self.mdir + "_" + self.info
-    def wedge(self, room) :
-        if (self.genus == Unc) :
-            if self.info != Full :
-                return Bsc.maximum([self.getCoRoom() , room])
-            else :
-                return None
-        else :
-            print("wedge error")
+  
     def __init__(self , _room , _mdir , _info, _genus = Sub) :
         self.room = _room
         self.mdir = _mdir
@@ -45,7 +40,15 @@ class Atom:
             if isinstance(other, Atom):
                 return self.__dict__ == other.__dict__
             return False    
+    def getUncCoRoom(self) : 
+        if (self.genus == Unc) :
+            if self.info == Full :
+                return Room(None,True)
+            if self.info == Zero :
+                return Room(self.room)
+        return Room(self.getCoRoom())
     def getCoRoom(self) : 
+        
         (x1,y1) = self.room
         x2 = x1
         y2 = y1
