@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 19 11:53:24 2024
+
+@author: tim
+"""
+tkr.Canvas.createRectDR = _createRectDR
+tkr.Canvas.createRectUL = _createRectUL 
+ 
+def _createRectUL(self,x,y,width, height,c , w) :
+    _min= min(width,height)
+    a= Area(self,_c=c,_w=w)
+    a.create_segments("line",    x+ rinv*_min ,y, x+width , y, x +width , y+ height, x , y + height, x , y +height - _min * roundcoef)    
+    a.create_segments("UL", x , y +height - _min * roundcoef, x+ rinv*_min ,y)
+    a.drawSegments()
+    return a
+
+     
+                        
+def _createRectDR(self,x,y,width, height,c , w=w) :
+    _min= min(width,height)
+    a= Area(self,_c=c,_w=w)
+    a.create_segments("line", x,y, x+width , y ,x+width, y+ _min*roundcoef)
+    a.create_segments("DR", x+width, y+ _min*roundcoef,x+ width-(rinv) * _min , y +  height)
+    #a.create_segments(False, x+ width-(rinv) * _min , y +  height,rinv * _min)
+    a.create_segments("line",x+width-rinv * _min , y +  height, x , y + height ,x,y)
+    a.drawSegments()
+    return a
+    #canvas.create_arc(x+width/3, y+height/3, width * 2 / 3, style="arc", outline=c, width=6, start=270, end=360)
+    #self.create_arc(x-width/3, y-height/3 , x+width , y +  height,start=270,extent = 90 , style="arc", outline=c, width=w) #,x+width, y+ height/3, 
+    
+    #self.create_circle_arcDR(,outline=c,width=w)
+    """ if (x2 - x1 == y2 - y1) : 
+                if (x2 > x1):
+                    
+                    self.create_segments("line",x1,y1,x1 , y2 , x2 , y2)
+                else :"""
+                    
+                
+                """
+                j = 0
+                
+                def cond (i,j , nhnv , arr) :
+                    if (i + j < len(arr)) :
+                b = False
+                for k in range(len(self.segments)):
+                    
+                        p = self.segments[k]
+                        d = direct [k]
+                        if True : # d != arr[i+j]:    
+                            if p.style != "line" and not isSpecialArc(p.style, p.x1, p.y1, p.x2, p.y2) and False :
+                                if  so(arr[i+j]) == so (d) : 
+                                    print(arr[i+j],d,"wichtig!")
+                                    
+                                b = b or so(arr[i+j]) == so (d)
+                            else :
+                                b = b or arr [i+j] == d
+                return b
+            else:
+                return False
+                
+          
+        for i in range (len(nh)):
+            
+            
+            
+                while cond(i,j,nh,hlab[nhp]) : 
+                    
+                    j = j + 1
+                   
+                    #print("inc",j,hlab[nhp][i+j])
+                #print(nh[i],hlab[nhp][i+j])    
+                if (i + j < len(hlab[nhp])) : direct[nh[i]] = hlab[nhp][i+j]
+            
+            
+        j = 0            
+        for i in range (len(nV)):
+      
+                while cond (i,j,nV, vlab[nVp]): 
+                    print("inc",j,vlab[nVp][i+j])
+                    j = j + 1
+            
+                    
+                
+                
+                if (i+j < len(vlab[nVp])): 
+                    print(nV[i],vlab[nVp][i+j])    
+                    direct[nV[i]] = vlab[nVp][i+j]
+            """
+            
+            """
+            canvas.createRectDR(50,50,200,100,"blue")
+            canvas.createRectUL(50,250,200,100,"blue")
+            canvas.createRect(originX + x * (stdWidth / 2 + 0.5*w) -  w * y, 
+                           originY + y * (stdHeight / 2 + 0.5*w) - w * x,
+                           stdWidth + 2 * w * y , stdHeight + 2 * w * x,c)
+
+            """
+
+            """
+
+
+
+            #canvas.create_circle(100, 120, 50, fill="blue", outline="#DDD", width=4)
+            #canvas.create_circle_arc(100, 120, 48, fill="green", outline="", start=45, end=140)
+
+            #canvas.create_circle_arc(100, 120, 48, fill="green", outline="", start=275, end=305)
+
+            #canvas.create_circle(150, 40, 20, fill="#BBB", outline="")
+
+
+
+
+            #canvas.createRect(50,50,100,200,'green',w=50)
+
+            #createRect(250,50 + (- 50 + 20)/2,100 ,200,'green',w=20)
+            #createRectDR(100,100, 300,300,'green')
+            #createRectUL(250,250, 300,300,'pink')
+
+
+            """

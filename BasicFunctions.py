@@ -6,8 +6,19 @@ Created on Fri Mar 22 12:22:39 2024
 @author: tim
 """
 import random
+def index_of (lst , x) :
+    l = get_indices(lst,x)
+    if (len(l) == 0) :
+        return -1
+    else :
+        return l[0]
 def get_indices(lst, *x):
     return [i for i, element in enumerate(lst) if element in x]
+def subList(l1,l2) :
+         for i in l1 :
+            if (not (i in l2)) :
+                 return False
+         return True 
 def so(s):
     return sorted(list(s))
 def get_random_color():

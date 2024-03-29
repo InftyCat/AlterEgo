@@ -123,15 +123,16 @@ class Area :
          
          self.segments = []
          self.canvas.update()
+  
      def findAllSegments(self,d,invert=False):
         self.generateDirections()
         ret = []
         for s in self.segments :
             if invert :
-                if (not (d in Bsc.so(s.dir))) :
+                if (not (Bsc.subList(Bsc.so(d) , Bsc.so(s.dir)))) :
                     ret.append(s)
             else :
-                if (d in Bsc.so(s.dir)):
+                if (Bsc.subList(Bsc.so(d) , Bsc.so(s.dir))):
                     ret.append(s)
         return ret
      def getSegIdxByTrg(self, trg) :
@@ -146,28 +147,35 @@ class Area :
                return l[0]
            else :
                return -1
-     def comp (self, quot) :
-         comp = Area(self.canvas,self.c,self.w * 1.5)
+     def comp (self, quot,unc=False) :
+         w = self.w * 1.5
+         c = self.c
+          
+         if (unc) :
+            w = self.w / 2
+            c = "black"
+         comp = Area(self.canvas,c,w )
          i = 0
          idx = quot.getSegIdxByTrg(self.segments[i].src())
-         #print("i,idx",i,idx)
+         print("i,idx",i,idx)
+         nunc = not unc
          while (idx == -1) :
-             comp.stealSegment(self.segments[i])
              
+             if (nunc) : comp.stealSegment(self.segments[i])
              i += 1
              idx = quot.getSegIdxByTrg(self.segments[i].src())
-          #   print("i,idx",i,idx)
+             print("i,idx",i,idx)
          
          j = self.getSegIdxBySrc(quot.segments[idx].src())
-         #print("j,idx",j,idx)
+         print("j,idx",j,idx)
          while (j == -1) :
             comp.stealSegment(quot.segments[idx].invert()) 
-          #  print("j,idx",j,idx)
+            print("j,idx",j,idx)
             j = self.getSegIdxBySrc(quot.segments[idx].src())
             idx -= 1
-            
-         for i in range(j,len(self.segments)) :             
-            comp.stealSegment(self.segments[i])
+         if nunc :
+             for i in range(j,len(self.segments)) :             
+                comp.stealSegment(self.segments[i])
          return comp
         
      def exactList(self) :

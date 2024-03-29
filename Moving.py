@@ -14,15 +14,15 @@ class Moving :
         self.wld = _wld
         
     def forward (self,d) :
-        s = self.wld.atom
+        s = self.wld.subobject()
         r = Atom.Atom(s.room, d,Ker).getCoRoom()
         #print("forward...",r,self.wld.areas.keys())
         if (r in self.wld.areas.keys()) :
-            exact = self.wld.areas[self.wld.atom.room].exactList()
+            exact = self.wld.areas[self.wld.subobject().room].exactList()
             if ((s.info == Ker or ((d in exact) and s.info == Im)) and s.mdir == d) or s.info == Zero:
-                self.wld.updateAtom( Atom.FullOrZeroAtom(r, Zero))
+                self.wld.updateSubobject( Atom.FullOrZeroAtom(r, Zero))
             else :
-                self.wld.updateAtom(Atom.Atom(r,d,Im))
+                self.wld.updateSubobject(Atom.Atom(r,d,Im))
         
             
         """(x,y) = s.room
@@ -34,14 +34,14 @@ class Moving :
         
         return Atom.Atom(r,d,Im)
     def backward(self,d) :
-        s = self.wld.atom
+        s = self.wld.subobject()
         room = Atom.Atom(s.room, d,Im).getCoRoom()
-        exact = self.wld.areas[self.wld.atom.room].exactList()
+        exact = self.wld.areas[s.room].exactList()
         if (room in self.wld.areas.keys()) :
             
             if ((s.info == Im or (s.info == Ker and d in exact)) and s.mdir == d) :
-                self.wld.updateAtom(Atom.FullOrZeroAtom(room,Full))
+                self.wld.updateSubobject(Atom.FullOrZeroAtom(room,Full))
             if (s.info == Zero) :
-                self.wld.updateAtom(Atom.Atom(room,d,Ker))
+                self.wld.updateSubobject(Atom.Atom(room,d,Ker))
             
         

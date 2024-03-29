@@ -13,6 +13,7 @@ import World
 import Area
 from Atom import Hori , Verti, Diag
 from Morphism import Mono, Epi
+import State
 import Atom
 import BasicFunctions as Bsc
 
@@ -80,8 +81,10 @@ tkr.Canvas.create_circle_arc = Area._create_circle_arc
 tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
 
-tkr.Canvas.createArea = Area._createArea        
-wld = World.World(canvas,  Atom.Atom((1,0),Atom.Verti,Atom.Ker )) #Atom.Atom((0,1),Atom.Hori,Atom.Ker)) #Atom.FullOrZeroAtom((0,0),"Full") ) # # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) #
+tkr.Canvas.createArea = Area._createArea      
+so =   Atom.FullOrZeroAtom((0,0),"Full")
+wld = World.World(canvas, so )
+ #Atom.Atom((1,0),Atom.Verti,Atom.Ker )) #Atom.Atom((0,1),Atom.Hori,Atom.Ker)) # # # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) #
 #wld.addArea(0,0)
 def f () :
     #wld.deleteAtom()
@@ -94,7 +97,7 @@ def ass () :
     #wld.updateAtom(Atom.Atom((0,0), Atom.Hori, Atom.Ker))
     #wld.drawAtom()
     
-wld.addMorphism(0, 0,0,1) # ,"Mono")
+wld.addMorphism(0, 0,0, 1 ,Epi)
 wld.addMorphism(0, 0,1,0)
 wld.addMorphism(1,0, 2, 0)
 
@@ -104,8 +107,8 @@ wld.addMorphism(0,1,1,1)
 wld.addMorphism(1,1,2,1)
 
 
-wld.addMorphism(2, 0, 3, 0,Mono)
-wld.addMorphism(2,0,2,1)
+wld.addMorphism(2, 0, 3, 0)# ,Mono)
+wld.addMorphism(2,0,2,1,Mono)
 
 wld.addMorphism(2, 1, 3, 1)
 wld.addMorphism(3,0,3,1,Mono)
@@ -113,9 +116,10 @@ wld.addMorphism(3,0,3,1,Mono)
 
 wld.initialize()
 
-wld.initSubArea()
+
 wld.drawAreas()
-wld.drawAtom()
+#wld.updateState(State.State(wld,so,(0,1)))
+wld.drawState()
 #wld.areas[(2,0)].generateDirections()
 """
 a00 = canvas.createRect2(0,0,'green' ,anzOut=2)#  ,ur=True,dl=True)
