@@ -20,6 +20,14 @@ class Room :
          print(self.room,room)
          if not self.infty :
                 self.room = Bsc.maximum([self.room , room])
+    def IsDeeperThan(self,room) :
+         if (self.infty) :
+              return True
+         else :
+                if (room.infty) : 
+                   return False
+                else :
+                     return Bsc.maximum([room.room,self.room]) == self.room
 """def wedge(self, room) :
         if (self.genus == Unc) :
             self.room.wedge(room)

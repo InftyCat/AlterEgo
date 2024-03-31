@@ -9,7 +9,7 @@ import Atom
 def newState(_wld,_subobject,uncRoom)  :
         return State(_wld,_subobject , _wld.genUnc(_subobject.room, uncRoom))
 def genFullUnc (subobject) :
-     return Atom.FullOrZeroAtom(subobject.room , Atom.Full)
+     return Atom.FullOrZeroAtom(subobject , Atom.Full)
 class State :
     def __str__(self) :
         return "(" + str(self.subobject) + "," + str(self.uncertainty) + ")"
@@ -17,4 +17,10 @@ class State :
         self.wld = _wld
         self.subobject = _subobject
         self.uncertainty = _uncertainty
-        print("inited" , _subobject,_uncertainty)
+        #print("inited" , _subobject,_uncertainty)
+    def isBiggerThan(self,state) :
+         myUnc = self.uncertainty.getUncCoRoom()
+         unc = state.uncertainty.getUncCoRoom()
+         b = myUnc.isBiggerThan(unc) 
+         return b and self.subobject.isBiggerThan(state.subobject)
+         

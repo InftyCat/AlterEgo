@@ -12,11 +12,12 @@ import Segment
 import Area
 import BasicFunctions as Bsc
 import Morphism
-import Moving
+
 from State import *
 from Atom import Ker , Im ,  Full , Hori , Verti , Diag
 import Atom
-import Moving
+from Molecule import *
+
 from Room import *
 originX = 200
 originY = 100
@@ -36,22 +37,20 @@ def getSubList(istart,iend,ay) :
         segs2 = ay[istart:-1] + [ay[-1]] + ay[0:iend]
     return segs2
 class World :
-    def __init__ (self,_canvas,_subobject) :
+    def __init__ (self,_canvas,_subobject,goalAtom) :
         self.canvas = _canvas
         self.areas = {} #{} #[[]]
         self.morphs = {}
         
         
-        self.state = self.canState(_subobject)
-        self.subobjectArea = None
-        self.uncertaintyArea = None
+        state = self.canState(_subobject)
+        goalstate = self.canState(goalAtom)
+        self.molecules = [Molecule(self,state,goalstate)]
         self.assCnt = 0
-        self.mvg = Moving.Moving(self)
-        
-    def subobject (self) :
-        return self.state.subobject
-    def uncertainty(self) :
-        return self.state.uncertainty
+    def subobjectAtom(self) :
+        return self.mm().subobject().atom
+    def move(self,forward,d) :
+        self.mm().move(forward,d)
     def addArea(self,x,y,exactHori=True,c=None) :
         if (c == None) :
             c = Bsc.get_random_color()
@@ -66,8 +65,17 @@ class World :
         
         
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
-
-        
+    def genUnc(self,room, unc) :
+            if room == unc :
+                return FullOrZeroAtom(room, Zero) # ,Unc)
+            mdir = self.getMdir(*room,*unc)
+            if (mdir == "")  :
+                return FullOrZeroAtom(room, Full)# ,Unc)
+            else :
+                return Atom.Atom(room, mdir,Ker)# ,Unc)
+    
+    def mm(self) : # main molecule
+        return self.molecules[-1]
     def getMdir(self,x1,y1,x2,y2) :
         d = self.getDir(x1,y1,x2,y2)
         b = (x1 - x2)**2 + (y1 - y2) ** 2
@@ -99,12 +107,12 @@ class World :
         ax = self.areas[(x1,y1)]
         ay =self.areas[(x2,y2)]
         d = self.getDir(x1,y1,x2,y2)
-        print(x1,y1,x2,y2,d)
+        #print(x1,y1,x2,y2,d)
         segs = ax.findAllSegments(d)
         
         sidx = 0
         tidx = len(segs) - 1
-        print(segs)
+        #print(segs)
         while (not (Bsc.inList(segs[sidx].src() , ay.getPoints() , Bsc.comPnts))) :
             sidx +=1
         while (not (Bsc.inList(segs[tidx].trg() , ay.getPoints() , Bsc.comPnts))) :
@@ -144,32 +152,26 @@ class World :
         else :
             return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
        
-    def genUnc(self,room, unc) :
-            if room == unc :
-                return Atom.FullOrZeroAtom(room, Atom.Zero,Atom.Unc)
-            mdir = self.getMdir(*room,*unc)
-            if (mdir == "")  :
-                return Atom.FullOrZeroAtom(room, Atom.Full,Atom.Unc)
-            else :
-                return Atom.Atom(room, mdir,Atom.Ker,Atom.Unc)
-            
+    def subobject(self) :
+        return self.mm().subobject()
     def canState (self,_subobject) :
             return newState(self,_subobject,_subobject.room)    
     def applyAss(self) :
-        r = self.subobject().room
+        r = self.mm().subobject().getRoom()
         morIn = [value for key, value in self.morphs.items() if value.trg() == r and value.prop== Morphism.Epi]
         morOut = [value for key, value in self.morphs.items() if value.src() == r and value.prop == Morphism.Mono]
         mor = morOut + morIn
+        #print("morphs:" , len(mor), "room",r)
         if (self.assCnt < len(mor)) :
             m = mor[self.assCnt]
             subobj = m.subobject()
             if self.assCnt < len(morOut) :
                 print("checking monomorphism")
-                if self.subobject() == subobj :
+                if self.subobject().atom == subobj :
                     print("apply mono goal")
-                    self.updateSubobject(Atom.FullOrZeroAtom(self.subobject().room, Atom.Zero))
+                    self.mm().updateStateFromSubobj(FullOrZeroAtom(r, Zero))
             else :                
-                    self.updateSubobject(mor[self.assCnt].subobject())
+                    self.mm().updateStateFromSubobj(mor[self.assCnt].subobject())
             self.assCnt += 1
         else :
             self.assCnt = 0
@@ -180,80 +182,10 @@ class World :
                 elif self.subobject().info == Im :
                     self.updateAtom(Atom.Atom(r,self.subobject().mdir,Ker))
                     """
-        print("New atom:" , self.subobject())
+        print("New atom:" , self.mm().subobject())
             # todo exactness
             
-                
-    def getSubArea(self) : 
-        atom = self.subobject()
-        (x1,y1) = atom.room
-        (x2,y2) = atom.getCoRoom()
-        #print(x1,y1,x2,y2)
-        if atom.info == Ker :     
-            return self.createker(x1,y1,x2,y2)
-        elif atom.info == Im :
-            return self.createImg(x1,y1,x2,y2)
-        elif atom.info == Full :
-            full = Area.Area(self.canvas,self.areas[(x1,y1)].c,15)
-            for s in self.areas[(x1,y1)].segments : full.stealSegment(s)
-            return full
-        elif atom.info == Atom.Zero:
-            zero = Area.Area(self.canvas,"black",3)
-            for s in self.areas[(x1,y1)].segments : zero.stealSegment(s)
-            return zero
-    def getUncArea(self) :
-        atom = self.subobject()
-        (x1,y1) = atom.room
-        r = self.uncertainty().getUncCoRoom()
-        if r.infty == False :
-            (x2,y2) = r.room
-            print("updated uncarea")
-            return self.createker(x1,y1,x2,y2,unc=True)
-        else :
-            print("uncarea now infty")
-            a = self.areas[(x1,y1)]
-            full = Area.Area(self.canvas,"black",a.w * 2)
-            for s in a.segments : full.stealSegment(s)
-            return full
-    def initState(self) : 
-        self.subobjectArea = self.getSubArea()
-        self.uncertaintyArea = self.getUncArea()
-    def deleteState(self) : 
-      self.subobjectArea.eraseSegments()  
-      self.uncertaintyArea.eraseSegments()
-    def updateState(self,state) :    
-      self.deleteState()
-      self.state = state
-      print("State  is now" , state)
-      
-      self.subobjectArea = self.getSubArea()
-      self.uncertaintyArea = self.getUncArea()
-      self.drawState()
-    def updateSubobject(self,subobject) :
-        print("finding max" , self.uncertainty().getCoRoom() , subobject.room)
-        
-        r = self.uncertainty().getUncCoRoom()
-        r.wedge(subobject.room)
-        print(r)
-        #print("uncRoom",uncRoom)
-        uncRoom  = r.room
-        if not r.infty :
-            self.updateState(newState(self,subobject,uncRoom))
-        else :
-            self.updateState(State(self,subobject,genFullUnc(subobject)))
-    def move(self,forward, d) :
-        
-        if forward :
-           #if 
-          self.mvg.forward(d)
-        else :
-           self.mvg.backward(d)
-    def drawAtom(self) :
-        self.subobjectArea.drawSegments() 
-        self.subobjectArea.drawMiddlepoint()
-    def drawState(self) : 
-         self.drawAtom()
-         self.uncertaintyArea.drawSegments() #Todo
+    
     def drawAreas(self) :
         for coords in self.areas.keys() :        
             self.areas[coords].drawSegments()
@@ -307,4 +239,4 @@ class World :
             self.areas[coords].initialize(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
                        originY + y * (stdHeight / 2) -  w / 2* (x + y),
                        stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),st)
-        self.initState()    
+        self.mm().initState()    

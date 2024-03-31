@@ -82,8 +82,9 @@ tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
 
 tkr.Canvas.createArea = Area._createArea      
-so =   Atom.FullOrZeroAtom((0,0),"Full")
-wld = World.World(canvas, so )
+so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
+go = Atom.FullOrZeroAtom((2,0),Atom.Zero)
+wld = World.World(canvas, so , go )
  #Atom.Atom((1,0),Atom.Verti,Atom.Ker )) #Atom.Atom((0,1),Atom.Hori,Atom.Ker)) # # # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) #
 #wld.addArea(0,0)
 def f () :
@@ -119,7 +120,8 @@ wld.initialize()
 
 wld.drawAreas()
 #wld.updateState(State.State(wld,so,(0,1)))
-wld.drawState()
+#wld.mm().initState()
+wld.mm().draw()
 #wld.areas[(2,0)].generateDirections()
 """
 a00 = canvas.createRect2(0,0,'green' ,anzOut=2)#  ,ur=True,dl=True)
