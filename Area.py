@@ -159,17 +159,17 @@ class Area :
          comp = Area(self.canvas,c,w )
          i = 0
          idx = quot.getSegIdxByTrg(self.segments[i].src())
-         print("i,idx",i,idx)
+         #print("i,idx",i,idx)
          nunc = not unc
          while (idx == -1) :
              
              if (nunc) : comp.stealSegment(self.segments[i])
              i += 1
              idx = quot.getSegIdxByTrg(self.segments[i].src())
-             print("i,idx",i,idx)
+          #   print("i,idx",i,idx)
          
          j = self.getSegIdxBySrc(quot.segments[idx].src())
-         print("j,idx",j,idx)
+         #print("j,idx",j,idx)
          
          comp.stealSegment(quot.segments[idx].invert()) 
          #print("j,idx",j,idx)
@@ -179,7 +179,8 @@ class Area :
          while (j == -1) :
             
             comp.stealSegment(quot.segments[idx].invert()) 
-            print("j,idx",j,idx)
+            
+            #print("j,idx",j,idx)
             j = self.getSegIdxBySrc(quot.segments[idx].src())
             idx -= 1
             

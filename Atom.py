@@ -29,7 +29,8 @@ class Atom:
         #    s = ""
             
         return s +"_" + self.mdir + "_" + self.info
-  
+    def isKernel(self , exact,d) : 
+        return ((self.info == Ker or ((d in exact) and self.info == Im)) and self.mdir == d) or self.info == Zero
     def __init__(self , _room , _mdir , _info) : #, _genus = Sub) :
         if (_info in [Im, Ker,Full,Zero]) :# _mdir in [Verti,Hori,Diag] and 
             self.room = _room

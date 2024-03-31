@@ -33,7 +33,7 @@ class Particle :
 #            self.updateSubob
             self.updateAtom(self.wld.genUnc(r, ur.room)) # return newState(self,subobject,uncRoom) # self.updateState(newState(self,subobject,uncRoom))
         else :
-            print("unc wedge infty",self.atom)
+            #print("unc wedge infty",self.atom)
             self.updateAtom(genFullUnc(r)) # self.updateState(State(self,))"""
 
     def updateAtom(self,_atom) :
@@ -85,8 +85,7 @@ class Particle :
                 for s in self.wld.areas[(x1,y1)].segments : zero.stealSegment(s)
                 return zero
         elif  self.genus == Unc :
-           
-        
+                   
         #atom = self.uncertainty()
             (x1,y1) = atom.room
             r = self.getUncCoRoom()
@@ -95,7 +94,8 @@ class Particle :
                 #print("updated uncarea")
                 return self.wld.createker(x1,y1,x2,y2,unc=True)
             else :
-                print("uncarea now infty")
+                
+                #print("uncarea now infty")
                 a = self.wld.areas[(x1,y1)]
                 full = Area.Area(self.wld.canvas,"black",a.w * 2)
                 for s in a.segments : full.stealSegment(s)

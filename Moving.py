@@ -22,7 +22,7 @@ class Moving :
 
      #updateSubobject
         #print("finding max" , self.uncertainty().getCoRoom() , subobject.room)
-    
+
     def forward (self,d) :
         #if self.molecule.genus == Unc :
 
@@ -36,7 +36,7 @@ class Moving :
         #print("forward...",r,self.wld.areas.keys())
         if (r in self.wld.areas.keys()) :
             exact = self.wld.areas[s.room].exactList()
-            if ((s.info == Ker or ((d in exact) and s.info == Im)) and s.mdir == d) or s.info == Zero:
+            if (s.isKernel(exact,d)):
                 self.molecule.updateAtom(Atom.FullOrZeroAtom(r, Zero)) #updateSubobject(
                 
             else :

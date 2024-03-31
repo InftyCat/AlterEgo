@@ -31,6 +31,7 @@ def dirToMdir(d) :
             return mdir[i]
         else :
             return ""
+
 def getSubList(istart,iend,ay) :
     segs2 = ay[istart:iend+1] # ay.findAllSegments(Bsc.invert(d))
     if (iend <= istart) :
@@ -59,12 +60,11 @@ class World :
             self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),exactHori) #[(x,y)] = c #[x].append(a)
     def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = ""):
         self.addArea(xs,ys)
-        self.addArea(xt,yt)
-        
-    
-        
-        
+        self.addArea(xt,yt)        
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
+    
+    def finMM(self) :
+        mm().fin()
     def genUnc(self,room, unc) :
             if room == unc :
                 return FullOrZeroAtom(room, Zero) # ,Unc)

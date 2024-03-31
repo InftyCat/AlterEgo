@@ -4,9 +4,11 @@ from Particle import *
 from State import *
 
 class Molecule :
-    def __init__ (self , _wld, _state,_goalState) :
+    def __init__ (self , _wld, _state,_eliminator) :
         self.state = _state
         self.wld = _wld
+        _goalState = _eliminator.targetState
+        self.eliminator = _eliminator
         self.SP = Particle(_wld,_state.subobject,Sub,_goalState)
         self.UP = Particle(_wld,_state.uncertainty,Unc,_goalState)
     def move(self,forward,d) : #todo
@@ -19,8 +21,13 @@ class Molecule :
         return self.SP.atom.room
     def getCanvas(self) :
         return self.wld.canvas
-    
-  
+    def fin(self) :
+        newM = self.eliminator.elim(self.state)
+        if newM == None : 
+            print("Not finishable!")
+        else :
+            self.wld.molecules = self.wld.molecules[0:-2] +  newM
+
     def draw(self) :
         
         self.subobject().initArea()

@@ -17,7 +17,7 @@ class Room :
                 return
             else :
                  room = room.room
-         print(self.room,room)
+         #print(self.room,room)
          if not self.infty :
                 self.room = Bsc.maximum([self.room , room])
     def IsDeeperThan(self,room) :

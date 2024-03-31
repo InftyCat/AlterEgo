@@ -142,17 +142,17 @@ canvas.createRect2(3,1,'white',anzIn=2)
 
 
 
-but = tkr.Button(frame, text="hori", command=f)
+"""but = tkr.Button(frame, text="hori", command=f)
 
 but.grid(row=1,column=0)
 but2 = tkr.Button(frame, text="verti", command=b)
 
 but2.grid(row=1,column=1)
 butAss = tkr.Button(frame,text="Ass" , command=ass)
-butAss.grid(row=1,column = 2)
-chars = ['w','a','s','d','c','q','f','j']
+butAss.grid(row=1,column = 2)"""
+chars = ['w','a','s','d','c','q','f','x','j']
 funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , 
-         lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss]
+         lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss , wld.finMM]
 def key_pressed(event):
     
     r = event.char
