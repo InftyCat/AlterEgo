@@ -19,8 +19,11 @@ class State :
         self.uncertainty = _uncertainty
         #print("inited" , _subobject,_uncertainty)
     def isBiggerThan(self,state) :
-         myUnc = self.uncertainty.getUncCoRoom()
-         unc = state.uncertainty.getUncCoRoom()
-         b = myUnc.isBiggerThan(unc) 
-         return b and self.subobject.isBiggerThan(state.subobject)
+         
+         myUnc = self.uncertainty.getKernelRoom()
+         unc = state.uncertainty.getKernelRoom()
+         b = myUnc.isDeeperThan(unc) 
+         ret = b and self.subobject.isBiggerThan(state.subobject)
+         #print(self , " > " , state , "=" , ret)
+         return ret
          

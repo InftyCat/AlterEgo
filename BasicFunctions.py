@@ -6,6 +6,10 @@ Created on Fri Mar 22 12:22:39 2024
 @author: tim
 """
 import random
+from enum import Enum
+class Genus(Enum) :
+    Unc = 1
+    Sub = 2
 def index_of (lst , x) :
     l = get_indices(lst,x)
     if (len(l) == 0) :

@@ -1,0 +1,44 @@
+Given a carpet C
+Sign. An atom in C lies at a certain subquotient of C.
+Signature. The genus of an atom is either subquotient or uncertainty.
+Axiom. The location of an uncertainty atom is always a kernel.
+Def. A molecule in C is the combination of two atoms with different genus lying in the same room.
+
+
+
+Sign. An atom is either frozen, storing a Goalstate, or it is part of a molecule.
+Def. The coparticle of a nonfrozen particle is the other particle in the respective molecule.
+
+Signature. A molecule has the following datum:
+    - An eliminator
+	- A history: The list of previous states, including the actual state
+	- One of its two atoms is leading
+    - A molecule can jump in time or can not.
+
+
+
+A situation is a carpet with a list of atoms.
+
+Given a situation one has three possibilities to change the situation
+
+a)  Freeze a coparticle
+    add a new zero uncertainty coparticle.
+    Set the genus of the particle to subquot.
+    The eliminator of the new molecule is defined by the frozen atom.
+    Set the new molecule to jumpable
+b)  If a molecule is in its target, use the eliminator
+c) Move a molecule
+	- forward in time:
+            move both particles in the molecule,
+            extend the history of both
+            set jumpbable to false
+	- If the molecule is jumpable:
+        jump backward in time:
+        Let u be the uncertainty of the current state
+		init the history.
+        If the history is now empty, set jumpable to false
+        replace the uncertainty of the current state by uncertainty determined by the
+        jumpback process and u
+      else
+        Go to a) and then jump backward in time
+d)

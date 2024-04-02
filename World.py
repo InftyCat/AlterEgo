@@ -5,14 +5,14 @@ Created on Fri Mar 22 14:11:14 2024
 
 @author: tim
 """
-
+from Particle import *
 import tkinter as tkr
 import random
 import Segment
 import Area
 import BasicFunctions as Bsc
 import Morphism
-
+from Eliminator import *
 from State import *
 from Atom import Ker , Im ,  Full , Hori , Verti , Diag
 import Atom
@@ -37,6 +37,7 @@ def getSubList(istart,iend,ay) :
     if (iend <= istart) :
         segs2 = ay[istart:-1] + [ay[-1]] + ay[0:iend]
     return segs2
+
 class World :
     def __init__ (self,_canvas,_subobject,goalAtom) :
         self.canvas = _canvas
@@ -46,7 +47,8 @@ class World :
         
         state = self.canState(_subobject)
         goalstate = self.canState(goalAtom)
-        self.molecules = [Molecule(self,state,goalstate)]
+        elim =  elimFromGoalState(goalstate)
+        self.molecules = [self.canMolecule(state,elim)]
         self.assCnt = 0
     def subobjectAtom(self) :
         return self.mm().subobject().atom
@@ -62,9 +64,10 @@ class World :
         self.addArea(xs,ys)
         self.addArea(xt,yt)        
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
-    
+    def swapFocus(self) :
+        self.mm().swapFocus()
     def finMM(self) :
-        mm().fin()
+        self.mm().fin()
     def genUnc(self,room, unc) :
             if room == unc :
                 return FullOrZeroAtom(room, Zero) # ,Unc)
@@ -151,7 +154,18 @@ class World :
            return zero
         else :
             return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
-       
+    def jumpback(self) :
+        self.mm().jumpback()
+    def canMolecule ( self, _state,_eliminator) :
+        #self.state = State()
+        #self.wld = _wld
+        _goalState = _eliminator.targetState
+        #self.eliminator = _eliminator
+        SP = lambda mol : Particle.Particle(mol,_state.subobject,Genus.Sub,_goalState)
+        UP =  lambda mol: Particle.Particle(mol,_state.uncertainty,Genus.Unc,_goalState)
+        focus = Genus.Sub
+        return Molecule(self,_eliminator,SP , UP)
+        
     def subobject(self) :
         return self.mm().subobject()
     def canState (self,_subobject) :

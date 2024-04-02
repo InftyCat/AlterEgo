@@ -83,7 +83,7 @@ tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
 
 tkr.Canvas.createArea = Area._createArea      
 so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
-go = Atom.FullOrZeroAtom((2,0),Atom.Zero)
+go =Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
 wld = World.World(canvas, so , go )
  #Atom.Atom((1,0),Atom.Verti,Atom.Ker )) #Atom.Atom((0,1),Atom.Hori,Atom.Ker)) # # # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) #
 #wld.addArea(0,0)
@@ -150,9 +150,9 @@ but2 = tkr.Button(frame, text="verti", command=b)
 but2.grid(row=1,column=1)
 butAss = tkr.Button(frame,text="Ass" , command=ass)
 butAss.grid(row=1,column = 2)"""
-chars = ['w','a','s','d','c','q','f','x','j']
+chars = ['w','a','s','d','c','q','f','x','p','j']
 funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , 
-         lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss , wld.finMM]
+         lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss , wld.finMM, wld.swapFocus , wld.jumpback]
 def key_pressed(event):
     
     r = event.char

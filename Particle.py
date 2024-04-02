@@ -2,20 +2,53 @@ import Room
 from Atom import *
 from State import *
 import Area
+import Molecule
+import Eliminator
 import Moving
+from BasicFunctions import Genus
 #from Area import *
-Sub = "SUB"
-Unc = "UNC"
+
+
+
+def swapGenus(genus: Genus) -> Genus :
+    if genus == Genus.Sub :
+        return Genus.Unc
+    elif genus == Genus.Unc :
+        return Genus.Sub
+
 class Particle :
-    def __init__ (self , _wld , _atom , _genus , _goalstate = None) : # , coparticle = None ) :
+    def __init__ (self , _molecule , _atom , _genus , _goalstate = None,) : # , coparticle = None ) :
         self.atom = _atom
         self.genus = _genus
         self.goalstate = _goalstate
         self.frozen = False
         self.area = None
-        self.wld = _wld
+        self.wld = _molecule.wld
         self.history = []
+        self.molecule = _molecule
         #self.coparticle= 
+        
+            
+        
+    def generateMoleculeFromSub(self,eliminator) :
+        _state = self.wld.canState(self.atom)    
+        self.molecule = self.wld.canMolecule(_state,eliminator)
+        self.molecule.jumpable = True
+        
+    def activateTimejump(self) :
+         if (not self.molecule.jumpable) :
+              
+         
+               oldcoparticle = self.getCoParticle()
+               eliminator = oldcoparticle.freeze()
+               self.generateMoleculeFromSub(eliminator) 
+
+            
+
+               print("now jumpable!")
+            
+
+    
     def __str__(self) :
         return str(self.atom)
     def move(self,forward, d) :
@@ -25,6 +58,9 @@ class Particle :
           mvg.forward(d)
         else :
            mvg.backward(d)
+    def getCoParticle(self) : 
+         cogenus = swapGenus(self.genus)
+         return self.molecule.getParticleFromGenus(cogenus)
     def uncWedge(self,r) :
         ur = self.getUncCoRoom()
         ur.wedge(r)
@@ -47,25 +83,24 @@ class Particle :
             #print("inited area" , self.area == None)
     def getGoalState(self) :
         """if (self.goalstate == None) :
-            if (self.genus == Unc) : 
+            if (self.genus == Genus.Unc) : 
                 print("I am an uncertainty particle, i dont know the goalstate!")
                 
         else :"""
         return self.goalstate
     def freeze (self ) :
         self.frozen = True
-        return
+        self.molecule = [] 
+        
+        return Eliminator.elimFromFrozenAtom(self)
+
     def getUncCoRoom(self) : 
-        if (self.genus == Unc) :
-            if self.atom.info == Full :
-                return Room(None,True)
-            if self.atom.info == Zero :
-                return Room(self.atom.room)
-        return Room(self.atom.getCoRoom())
+        return self.atom.getKernelRoom(self.genus == Genus.Unc)
+        
     def getAreaFromAtom(self) : 
         
         atom = self.atom
-        if self.genus == Sub :
+        if self.genus == Genus.Sub :
         #atom = self.subobject()
             (x1,y1) = atom.room
             
@@ -84,7 +119,7 @@ class Particle :
                 zero = Area.Area(self.wld.canvas,"black",3)
                 for s in self.wld.areas[(x1,y1)].segments : zero.stealSegment(s)
                 return zero
-        elif  self.genus == Unc :
+        elif  self.genus == Genus.Unc :
                    
         #atom = self.uncertainty()
             (x1,y1) = atom.room

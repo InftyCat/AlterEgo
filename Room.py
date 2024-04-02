@@ -20,7 +20,7 @@ class Room :
          #print(self.room,room)
          if not self.infty :
                 self.room = Bsc.maximum([self.room , room])
-    def IsDeeperThan(self,room) :
+    def isDeeperThan(self,room) :
          if (self.infty) :
               return True
          else :
@@ -29,7 +29,7 @@ class Room :
                 else :
                      return Bsc.maximum([room.room,self.room]) == self.room
 """def wedge(self, room) :
-        if (self.genus == Unc) :
+        if (self.genus == Genus.Unc) :
             self.room.wedge(room)
             if self.info != Full :
                 return Bsc.maximum([self.getCoRoom() , room])

@@ -1,5 +1,6 @@
-from Particle import *
+import Particle
 import Atom
+from BasicFunctions import Genus
 #import State
 
 """
@@ -28,6 +29,7 @@ class Eliminator :
         self.targetState = _targetState
         self.f = _f
     def elim(self , s) :
+    #    print("state now" , s)
         if (self.targetState.isBiggerThan(s)) : 
             return self.f(s) 
         else :
@@ -37,9 +39,9 @@ def elimFromGoalState(goalstate) :
     return Eliminator(goalstate , lambda s : [])
 def elimFromFrozenAtom(particle) :
     full = Atom.FullOrZeroAtom(particle.getRoom(),Atom.Full)
-    if particle.genus == Unc :
+    if particle.genus == Genus.Unc :
             return Eliminator(full,lambda s : [((s.subobject.atom , particle.atom ) , s.goalstate) , ((s.uncertainty.atom , particle.atom), s.goalstate)])
-    elif particle.genus == Sub :
+    elif particle.genus == Genus.Sub :
          def f (s) :
               if s.subobject.atom.isKernel() :
                   return [((particle.atom , s.subobject.atom ) , s.goalstate) , ((particle.atom , s.uncertainty.atom ), (particle.atom , s.subobject.atom ))]

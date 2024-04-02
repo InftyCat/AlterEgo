@@ -1,16 +1,33 @@
 from Atom import *
 import Area
-from Particle import *
+import Particle #Genus, Particle
 from State import *
+from BasicFunctions import Genus
+    #uncState = self.wld.canState(self.atom)    
 
+    
+        
 class Molecule :
-    def __init__ (self , _wld, _state,_eliminator) :
-        self.state = _state
+    def __init__ (self, _wld ,_eliminator, initSP , initUP) :             
         self.wld = _wld
-        _goalState = _eliminator.targetState
-        self.eliminator = _eliminator
-        self.SP = Particle(_wld,_state.subobject,Sub,_goalState)
-        self.UP = Particle(_wld,_state.uncertainty,Unc,_goalState)
+        self.SP = initSP(self)
+        self.UP = initUP(self)
+        self.focus = Genus.Sub
+        self.jumpable = False
+        self.state = State(_wld,self.SP.atom,self.UP.atom)
+   
+    def swapFocus(self) :
+        self.focus = Particle.swapGenus(self.focus)
+    def getParticleFromGenus(self,genus) :
+        if genus == Genus.Sub :
+            return self.SP
+        else :
+            return self.UP
+    def jumpback(self) : 
+        if (self.jumpable) : 
+            return
+        else :            
+            self.getParticleFromGenus(self.focus).activateTimejump()
     def move(self,forward,d) : #todo
 
         self.SP.move(forward,d)
@@ -21,13 +38,17 @@ class Molecule :
         return self.SP.atom.room
     def getCanvas(self) :
         return self.wld.canvas
+    def getState(self) :
+        return State(self.wld,self.subobject().atom , self.uncertainty().atom)
     def fin(self) :
-        newM = self.eliminator.elim(self.state)
+        newM = self.eliminator.elim(self.getState())
         if newM == None : 
             print("Not finishable!")
         else :
             self.wld.molecules = self.wld.molecules[0:-2] +  newM
-
+        
+        print("eliminated molecule. Remaining : " , len(self.wld.molecules))
+        self.erase()
     def draw(self) :
         
         self.subobject().initArea()
@@ -46,7 +67,9 @@ class Molecule :
     def updateUncFromSubObj(self) :
         
         self.uncertainty().uncWedge(self.subobject().getRoom())
-        
+    def erase(self) :
+        self.SP.area.eraseSegments()
+        self.UP.area.eraseSegments() 
     def updateStateFromSubobj(self,subobject) :
         self.subobject().updateAtom(subobject)
         self.updateUncFromSubObj()
