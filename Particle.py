@@ -26,38 +26,49 @@ class Particle :
         self.wld = _molecule.wld
         self.history = []
         self.molecule = _molecule
+        
+        #print("I was born as particle " + str(id(self)))
         #self.coparticle= 
         
             
         
     def generateMoleculeFromSub(self,eliminator) :
         _state = self.wld.canState(self.atom)    
-        self.molecule = self.wld.canMolecule(_state,eliminator)
+        self.molecule = self.wld.canMolecule2(lambda x : self , _state.uncertainty,eliminator)
+        self.wld.molecules.append(self.molecule)
         self.molecule.jumpable = True
         
     def activateTimejump(self) :
-         if (not self.molecule.jumpable) :
-              
-         
+         if (not self.molecule.jumpable) :                     
                oldcoparticle = self.getCoParticle()
                eliminator = oldcoparticle.freeze()
                self.generateMoleculeFromSub(eliminator) 
-
-            
-
-               print("now jumpable!")
-            
-
+               print("now jumpable!")               
+         else :
+             print("sth fishy")
     
+    
+         
+    def jumpback(self) :
+        if (len(self.history)==0) : 
+            print(self , " : I have no history!")
+        else :
+            h = self.history[-1]
+            self.history = self.history [:-1]
+            self.updateAtom(h,jumpback=True)
+            #self.draw
+
+
     def __str__(self) :
-        return str(self.atom)
+        return str(self.genus) + "__" + str(self.atom) + "_Age : " + str(len(self.history)) #+ "_Id : " + str(id(self) )
     def move(self,forward, d) :
         mvg = Moving.Moving(self.wld,self)
         if forward :
            #if 
-          mvg.forward(d)
+          r = mvg.forward(d)
         else :
-           mvg.backward(d)
+           r = mvg.backward(d)
+        return r
     def getCoParticle(self) : 
          cogenus = swapGenus(self.genus)
          return self.molecule.getParticleFromGenus(cogenus)
@@ -72,10 +83,14 @@ class Particle :
             #print("unc wedge infty",self.atom)
             self.updateAtom(genFullUnc(r)) # self.updateState(State(self,))"""
 
-    def updateAtom(self,_atom) :
-        self.history.append(self.atom)
-        self.area.eraseSegments()
+    def updateAtom(self,_atom : Atom,jumpback=False) :
+        
+        if (not jumpback) : 
+            self.history.append(self.atom)
+        if self.area != None :
+            self.area.eraseSegments()
         self.atom = _atom 
+        #print("updated atom", self )
     def getRoom(self) :
         return self.atom.room
     def initArea(self) :      
@@ -89,10 +104,17 @@ class Particle :
         else :"""
         return self.goalstate
     def freeze (self ) :
+        #todo
         self.frozen = True
         self.molecule = [] 
         
-        return Eliminator.elimFromFrozenAtom(self)
+        el = Eliminator.elimFromFrozenAtom(self)
+        if (el != None) : 
+            print("constructed eliminator")
+        else :
+            print("sth went wrong")
+        print("Now frozen: ", self)
+        return el
 
     def getUncCoRoom(self) : 
         return self.atom.getKernelRoom(self.genus == Genus.Unc)

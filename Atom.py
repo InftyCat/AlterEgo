@@ -76,7 +76,9 @@ class Atom:
         return (x2,y2)
     def isBiggerThan(self , atom):
         ret = False
-
+        if (not isinstance(atom,Atom)) : 
+             print("Atom comparing error")
+             return
         if self.room != atom.room :
             ret = False
         else :

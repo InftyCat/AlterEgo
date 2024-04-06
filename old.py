@@ -43,3 +43,35 @@ Created on Thu Mar 28 11:48:27 2024
                 ker.stealSegment(s)
                     
             return ker
+
+
+
+ def applyAssMonoEpi(self) :
+        r = self.mm().subobject().getRoom()
+        morIn = [value for key, value in self.morphs.items() if value.trg() == r and value.prop== Morphism.Epi]
+        morOut = [value for key, value in self.morphs.items() if value.src() == r and value.prop == Morphism.Mono]
+        mor = morOut + morIn
+        #print("morphs:" , len(mor), "room",r)
+        if (self.assCnt < len(mor)) :
+            m = mor[self.assCnt]
+            subobj = m.subobject()
+            if self.assCnt < len(morOut) :
+                print("checking monomorphism")
+                if self.subobject().atom == subobj :
+                    print("apply mono goal")
+                    self.mm().updateStateFromSubobj(FullOrZeroAtom(r, Zero))
+            else :                
+                    self.mm().updateStateFromSubobj(mor[self.assCnt].subobject())
+            self.assCnt += 1
+        else :
+            self.assCnt = 0
+            """
+            if self.areas[r].exactHori :
+                if self.subobject().info == Ker :    
+                    self.updateAtom(Atom.Atom(r,self.subobject().mdir,Im))
+                elif self.subobject().info == Im :
+                    self.updateAtom(Atom.Atom(r,self.subobject().mdir,Ker))
+                    """
+        #print("used assumption atom:" , self.mm().subobject())
+            # todo exactness
+     

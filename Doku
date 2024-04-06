@@ -6,6 +6,25 @@ Def. A molecule in C is the combination of two atoms with different genus lying 
 
 
 
+
+Definition. An eliminator is a pair target state T x (S x (S <= T) -> [(State , GoalState)])
+Definition. There is a subquot |u| determined by a uncertainty u
+Definition. The uncertainty ?s determined by a subquot s of $a$ is the maximal u such that s \ u = s.
+    If it does not exist, we set it to infty.
+Ex :
+    - a goal state, it sends every S with S <= T to the empty List.
+	- a frozen atom (A , goalstate): Given (s , u), then depending on the genus of A:
+				uncertainty:
+                    T = Full a (vorher infty )
+                    Send to [(s , A) ,(|u| , A)]
+                subquot:
+                    T = Full a
+                    Send to [((A,u) --> (A,?s)), (A,s) --> goalstate]
+
+
+
+
+
 Sign. An atom is either frozen, storing a Goalstate, or it is part of a molecule.
 Def. The coparticle of a nonfrozen particle is the other particle in the respective molecule.
 

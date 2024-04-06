@@ -2,38 +2,60 @@ from Atom import *
 import Area
 import Particle #Genus, Particle
 from State import *
-from BasicFunctions import Genus
+import World
+from Eliminator import *
+from BasicFunctions import Genus , e
     #uncState = self.wld.canState(self.atom)    
 
     
         
 class Molecule :
-    def __init__ (self, _wld ,_eliminator, initSP , initUP) :             
+    def __init__ (self, _wld : World ,_eliminator, initSP , initUP) :             
         self.wld = _wld
         self.SP = initSP(self)
         self.UP = initUP(self)
         self.focus = Genus.Sub
         self.jumpable = False
         self.state = State(_wld,self.SP.atom,self.UP.atom)
+        self.eliminator = _eliminator
    
     def swapFocus(self) :
         self.focus = Particle.swapGenus(self.focus)
+
     def getParticleFromGenus(self,genus) :
         if genus == Genus.Sub :
             return self.SP
         else :
             return self.UP
+        
     def jumpback(self) : 
         if (self.jumpable) : 
-            return
-        else :            
-            self.getParticleFromGenus(self.focus).activateTimejump()
-    def move(self,forward,d) : #todo
+            #u = self.UP.atom
+            if len(self.SP.history) == 0 :
+                print("History is empty! This should not happen")
+            else :
+                #print(self.SP.history)
+                self.SP.jumpback()
+                if len(self.subobject().history) == 0 :
+                    self.jumpable = False
+                
 
-        self.SP.move(forward,d)
+            
+            self.updateUncFromSubObj()
+            self.draw()
+            
+        else :           
+            p =  self.getParticleFromGenus(self.focus)
+         
+            eliminator = p.activateTimejump()
+
+    def move(self,forward,d) : #todo
+        self.jumpable = False
+        hasMoved = self.SP.move(forward,d)
+        if hasMoved :
         # think of erasing subobjects if uncertainty is full
-        self.updateUncFromSubObj()
-        self.draw()
+            self.updateUncFromSubObj()
+            self.draw()
     def room(self) :
         return self.SP.atom.room
     def getCanvas(self) :
@@ -45,10 +67,20 @@ class Molecule :
         if newM == None : 
             print("Not finishable!")
         else :
-            self.wld.molecules = self.wld.molecules[0:-2] +  newM
+            self.wld.molecules = self.wld.molecules[0:-2] 
+            self.erase()
+            for m in newM :
+                (s , gs) = m
+
+                e(s , State)
+                e(gs , State)
+                m = self.wld.canMolecule(s,elimFromGoalState(gs))
+                self.wld.molecules.append(m)
+                m.draw()
+               
         
         print("eliminated molecule. Remaining : " , len(self.wld.molecules))
-        self.erase()
+    
     def draw(self) :
         
         self.subobject().initArea()
@@ -70,7 +102,7 @@ class Molecule :
     def erase(self) :
         self.SP.area.eraseSegments()
         self.UP.area.eraseSegments() 
-    def updateStateFromSubobj(self,subobject) :
+    def updateStateFromSubobj(self,subobject : Atom) :
         self.subobject().updateAtom(subobject)
         self.updateUncFromSubObj()
 

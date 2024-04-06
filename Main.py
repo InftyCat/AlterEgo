@@ -80,87 +80,73 @@ tkr.Canvas.createRect = _createRect
 tkr.Canvas.create_circle_arc = Area._create_circle_arc
 tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
-
 tkr.Canvas.createArea = Area._createArea      
-so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
-go =Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
-wld = World.World(canvas, so , go )
- #Atom.Atom((1,0),Atom.Verti,Atom.Ker )) #Atom.Atom((0,1),Atom.Hori,Atom.Ker)) # # # Atom.Atom((0,0), Atom.Hori, Atom.Ker)) # ) #
-#wld.addArea(0,0)
-def f () :
-    #wld.deleteAtom()
-    #canvas.delete(wld.subobject)
-    wld.move(True,Atom.Hori)
-def b () :
-    wld.move(True,Atom.Verti)
-def ass () :
-    wld.applyAss()    
-    #wld.updateAtom(Atom.Atom((0,0), Atom.Hori, Atom.Ker))
-    #wld.drawAtom()
+def viererMono() :
+
+    so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
+    go =Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
+    wld = World.World(canvas, so , go )
+
+    wld.addMorphism(0, 0,0, 1 ,Epi)
+    wld.addMorphism(0, 0,1,0)
+    wld.addMorphism(1,0, 2, 0)
+
+    #wld.addArea(x, y)
+    wld.addMorphism(1, 0,1,1,Mono)
+    wld.addMorphism(0,1,1,1)
+    wld.addMorphism(1,1,2,1)
+
+
+    wld.addMorphism(2, 0, 3, 0)# ,Mono)
+    wld.addMorphism(2,0,2,1,Mono)
+
+    wld.addMorphism(2, 1, 3, 1)
+    wld.addMorphism(3,0,3,1,Mono)
+
+def epiIntro() :
+    so =Atom.FullOrZeroAtom((1,0),"Full")
+    go = Atom.Atom((1,0),Atom.Hori,Atom.Im)
+    wld = World.World(canvas, so , go )
+    wld.addMorphism(0,0,1,0)
+    wld.addMorphism(1,0,1,1)
     
-wld.addMorphism(0, 0,0, 1 ,Epi)
-wld.addMorphism(0, 0,1,0)
-wld.addMorphism(1,0, 2, 0)
-
-#wld.addArea(x, y)
-wld.addMorphism(1, 0,1,1,Mono)
-wld.addMorphism(0,1,1,1)
-wld.addMorphism(1,1,2,1)
-
-
-wld.addMorphism(2, 0, 3, 0)# ,Mono)
-wld.addMorphism(2,0,2,1,Mono)
-
-wld.addMorphism(2, 1, 3, 1)
-wld.addMorphism(3,0,3,1,Mono)
-
-
+    wld.addMorphism(0,0,1,1)
+    wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
+    wld.implications.append((Atom.Atom((1,1),Atom.Verti,Atom.Im) , Atom.Atom((1,1),Atom.Diag,Atom.Im)))
+    return wld
+def monoIntro() :
+    so =  Atom.Atom((1,0),Atom.Verti,Atom.Ker)
+    go =Atom.FullOrZeroAtom((1,0),"Zero")
+    wld = World.World(canvas, so , go )
+    wld.addMorphism(0,0,1,0)
+    wld.addMorphism(1,0,1,1)
+    
+    wld.addMorphism(0,0,1,1)
+    wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
+    wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
+    return wld
+wld = epiIntro()
 wld.initialize()
 
 
 wld.drawAreas()
-#wld.updateState(State.State(wld,so,(0,1)))
-#wld.mm().initState()
 wld.mm().draw()
-#wld.areas[(2,0)].generateDirections()
-"""
-a00 = canvas.createRect2(0,0,'green' ,anzOut=2)#  ,ur=True,dl=True)
-#a = canvas.createRect2(0,2,'green')
-#a.drawPoints()
 
-a01 = canvas.createRect2(0,1,"pink",ur=True)
-a10 = canvas.createRect2(1,0,'purple',anzOut=2)
-a11 = canvas.createRect2(1,1,'red',anzIn=2,ur=True)
-#obj = canvas.create
-canvas.createRect2(2,0,'cyan',anzOut=2,dl=True)
-canvas.createRect2(2,1,'yellow',anzIn=2)
-
-canvas.createRect2(3,0,'black',dl=True)
-canvas.createRect2(3,1,'white',anzIn=2)
-"""
-
-
-
-
-"""but = tkr.Button(frame, text="hori", command=f)
-
-but.grid(row=1,column=0)
-but2 = tkr.Button(frame, text="verti", command=b)
-
-but2.grid(row=1,column=1)
-butAss = tkr.Button(frame,text="Ass" , command=ass)
-butAss.grid(row=1,column = 2)"""
 chars = ['w','a','s','d','c','q','f','x','p','j']
 funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , 
          lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss , wld.finMM, wld.swapFocus , wld.jumpback]
+
+
+
 def key_pressed(event):
     
     r = event.char
     i = Bsc.get_indices(chars,r) 
     #print(i,r,r in chars)
-    if (len(i) > 0) :
-        funcs[i[0]]()
-        #print("Key pressed:", )
+    if not wld.gameEnd()  :
+        if (len(i) > 0) :
+            funcs[i[0]]()
+            #print("Key pressed:", )
 
 
 tk.title("Key Listener")

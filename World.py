@@ -50,6 +50,34 @@ class World :
         elim =  elimFromGoalState(goalstate)
         self.molecules = [self.canMolecule(state,elim)]
         self.assCnt = 0
+        self.implications = []                
+    def applyAss(self) :
+        s = self.mm().subobject().atom
+        bs = []
+        print("checking asses")
+        for i in self.implications : 
+            print(i)
+            (a,b) = i
+            
+            if a.isBiggerThan(s) :
+
+                # one should be able to get to original state back
+                bs.append(b)
+        if (self.assCnt < len(bs)) :
+            
+                        
+            self.mm().updateStateFromSubobj(bs[self.assCnt])
+            self.assCnt += 1
+        else :
+            self.assCnt = 0
+    def morPropToImp(self) :
+        epis = [ value for key, value in self.morphs.items() if value.prop== Morphism.Epi]
+        monos = [value for key, value in self.morphs.items() if value.prop == Morphism.Mono]
+        for e in epis :
+            self.implications.append((FullOrZeroAtom(e.subobject.room, Full) , e.subobject()))
+        for m in monos : 
+            self.implications.append(( m.subobject() , FullOrZeroAtom(m.subobject().room, Zero) ))
+          
     def subobjectAtom(self) :
         return self.mm().subobject().atom
     def move(self,forward,d) :
@@ -76,8 +104,10 @@ class World :
                 return FullOrZeroAtom(room, Full)# ,Unc)
             else :
                 return Atom.Atom(room, mdir,Ker)# ,Unc)
-    
+    def gameEnd(self) : 
+        return len(self.molecules) == 0
     def mm(self) : # main molecule
+        
         return self.molecules[-1]
     def getMdir(self,x1,y1,x2,y2) :
         d = self.getDir(x1,y1,x2,y2)
@@ -86,6 +116,9 @@ class World :
             return dirToMdir(d)
         else :
             return ""    
+    def addAss(self, assAtom, impAtom) :
+        self.implications.append((assAtom, impAtom))
+
     def getDir(self,x1,y1,x2,y2) :
         d = ""
         if x1 == x2 :
@@ -98,12 +131,13 @@ class World :
             if ((x1,y1,x2,y2) in self.morphs) :
                 d = self.morphs[(x1,y1,x2,y2)].specialDir
         return d        
-    def out(self , x, y) :
-        return [value.trg() for key, value in self.morphs.items() if value.src() == (x,y)]
+    def out(self , x, y,allowdiag=True) :
+        return [value.trg() for key, value in self.morphs.items() if value.src() == (x,y) and (allowdiag or self.getDir(*value.src() , *value.trg()) != "SO") ]
         
         
-    def into(self , x, y) :
-        return [value.src() for key, value in self.morphs.items() if value.trg() == (x,y)]
+    def into(self , x, y,allowdiag=True) :
+        return [value.src() for key, value in self.morphs.items() if value.trg() == (x,y)  and (allowdiag or self.getDir(*value.src() , *value.trg()) != "SO") ]
+    
     
         
     def createImg(self,x2,y2,x1,y1,unc=False):
@@ -140,7 +174,7 @@ class World :
             #print(istart,iend)
             segs2 = getSubList(istart,iend,ay.segments)
             
-            img= Area.Area(self.canvas,ay.c,ay.w*1.5)
+            img= Area.Area(self.canvas,ay.c,ay.w*2) #1.5)
             for s in segs + segs2 :
                 img.stealSegment(s)
                     
@@ -156,49 +190,30 @@ class World :
             return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
     def jumpback(self) :
         self.mm().jumpback()
-    def canMolecule ( self, _state,_eliminator) :
+    def canMolecule2 (self, SP ,  uncAtom , _eliminator) :
+        _goalState = _eliminator.targetState
+        #print("creating can Molecule")
+        
+        UP =  lambda mol: Particle.Particle(mol,uncAtom,Genus.Unc,_goalState)
+        focus = Genus.Sub
+        return Molecule(self,_eliminator,SP , UP)
+    def canMolecule ( self,_state ,_eliminator) :
         #self.state = State()
         #self.wld = _wld
         _goalState = _eliminator.targetState
         #self.eliminator = _eliminator
+        print("creating can Molecule from state" , _state)
         SP = lambda mol : Particle.Particle(mol,_state.subobject,Genus.Sub,_goalState)
-        UP =  lambda mol: Particle.Particle(mol,_state.uncertainty,Genus.Unc,_goalState)
+       
         focus = Genus.Sub
-        return Molecule(self,_eliminator,SP , UP)
+        return self.canMolecule2(SP , _state.uncertainty , _eliminator) #Molecule(self,_eliminator,SP , UP)
         
     def subobject(self) :
         return self.mm().subobject()
     def canState (self,_subobject) :
-            return newState(self,_subobject,_subobject.room)    
-    def applyAss(self) :
-        r = self.mm().subobject().getRoom()
-        morIn = [value for key, value in self.morphs.items() if value.trg() == r and value.prop== Morphism.Epi]
-        morOut = [value for key, value in self.morphs.items() if value.src() == r and value.prop == Morphism.Mono]
-        mor = morOut + morIn
-        #print("morphs:" , len(mor), "room",r)
-        if (self.assCnt < len(mor)) :
-            m = mor[self.assCnt]
-            subobj = m.subobject()
-            if self.assCnt < len(morOut) :
-                print("checking monomorphism")
-                if self.subobject().atom == subobj :
-                    print("apply mono goal")
-                    self.mm().updateStateFromSubobj(FullOrZeroAtom(r, Zero))
-            else :                
-                    self.mm().updateStateFromSubobj(mor[self.assCnt].subobject())
-            self.assCnt += 1
-        else :
-            self.assCnt = 0
-            """
-            if self.areas[r].exactHori :
-                if self.subobject().info == Ker :    
-                    self.updateAtom(Atom.Atom(r,self.subobject().mdir,Im))
-                elif self.subobject().info == Im :
-                    self.updateAtom(Atom.Atom(r,self.subobject().mdir,Ker))
-                    """
-        print("New atom:" , self.mm().subobject())
-            # todo exactness
-            
+            return newState(self,_subobject,_subobject.room)   
+    
+
     
     def drawAreas(self) :
         for coords in self.areas.keys() :        
@@ -211,8 +226,8 @@ class World :
         dl = []
         ur = []
         for coords in self.areas.keys() :
-            o = self.out(*coords)
-            i = self.into(*coords)
+            o = self.out(*coords,allowdiag=False)
+            i = self.into(*coords,allowdiag=False)
             curveDR = False
             curveUL = False
             #print(coords,o,i)
@@ -238,9 +253,10 @@ class World :
                 
         for coords in ul:
             (x,y) = coords
-            
-            if ((self.areas[(x-1,y)].exactHori)) :
-                ur.append((x-2,y))
+            if (x-1,y) in self.areas.keys() :
+
+                if ((self.areas[(x-1,y)].exactHori)) :
+                    ur.append((x-2,y))
         for coords in self.areas.keys() :
             st= []
             (x,y) = coords
@@ -253,4 +269,5 @@ class World :
             self.areas[coords].initialize(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
                        originY + y * (stdHeight / 2) -  w / 2* (x + y),
                        stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),st)
-        self.mm().initState()    
+        self.mm().initState() 
+        self.morPropToImp()

@@ -10,6 +10,9 @@ from enum import Enum
 class Genus(Enum) :
     Unc = 1
     Sub = 2
+def e(x , A ) : 
+    if not (isinstance(x , A)) : 
+        raise Exception("Type checking fails" , x , A)    
 def index_of (lst , x) :
     l = get_indices(lst,x)
     if (len(l) == 0) :
