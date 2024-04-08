@@ -102,7 +102,7 @@ def viererMono() :
 
     wld.addMorphism(2, 1, 3, 1)
     wld.addMorphism(3,0,3,1,Mono)
-
+    return wld
 def epiIntro() :
     so =Atom.FullOrZeroAtom((1,0),"Full")
     go = Atom.Atom((1,0),Atom.Hori,Atom.Im)
@@ -114,6 +114,17 @@ def epiIntro() :
     wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
     wld.implications.append((Atom.Atom((1,1),Atom.Verti,Atom.Im) , Atom.Atom((1,1),Atom.Diag,Atom.Im)))
     return wld
+def kernelInc() :
+    so =  Atom.Atom((0,0),Atom.Diag,Atom.Ker)
+    go = Atom.Atom((0,0),Atom.Hori,Atom.Ker)
+    wld = World.World(canvas, so , go )
+    wld.addMorphism(0,0,1,0)
+    wld.addMorphism(1,0,1,1,Mono)
+    
+    wld.addMorphism(0,0,1,1)
+    return wld
+    #wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
+    #wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
 def monoIntro() :
     so =  Atom.Atom((1,0),Atom.Verti,Atom.Ker)
     go =Atom.FullOrZeroAtom((1,0),"Zero")
@@ -125,7 +136,7 @@ def monoIntro() :
     wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
     wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
     return wld
-wld = epiIntro()
+wld = epiIntro() #kernelInc() #viererMono()
 wld.initialize()
 
 

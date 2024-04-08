@@ -18,7 +18,8 @@ class Molecule :
         self.jumpable = False
         self.state = State(_wld,self.SP.atom,self.UP.atom)
         self.eliminator = _eliminator
-   
+    def __str__(self) : 
+        return str(self.SP) + "," + str (self.UP)
     def swapFocus(self) :
         self.focus = Particle.swapGenus(self.focus)
 
@@ -78,8 +79,12 @@ class Molecule :
                 self.wld.molecules.append(m)
                 m.draw()
                
-        
-        print("eliminated molecule. Remaining : " , len(self.wld.molecules))
+        anz =  len(self.wld.molecules)
+        print("eliminated molecule. Remaining : " ,anz)
+        if (anz > 0) :
+            print("next molecule:" , self.wld.mm())
+        else : 
+            print("You won!")
     
     def draw(self) :
         

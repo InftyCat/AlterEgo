@@ -74,7 +74,7 @@ class World :
         epis = [ value for key, value in self.morphs.items() if value.prop== Morphism.Epi]
         monos = [value for key, value in self.morphs.items() if value.prop == Morphism.Mono]
         for e in epis :
-            self.implications.append((FullOrZeroAtom(e.subobject.room, Full) , e.subobject()))
+            self.implications.append((FullOrZeroAtom(e.subobject().room, Full) , e.subobject()))
         for m in monos : 
             self.implications.append(( m.subobject() , FullOrZeroAtom(m.subobject().room, Zero) ))
           
