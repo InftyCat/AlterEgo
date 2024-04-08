@@ -22,10 +22,10 @@ class Particle :
         self.genus = _genus
         self.goalstate = _goalstate
         self.frozen = False
-        self.area = None
         self.wld = _molecule.wld
         self.history = []
         self.molecule = _molecule
+        self.area = None #self.initArea()
         
         #print("I was born as particle " + str(id(self)))
         #self.coparticle= 
@@ -36,6 +36,7 @@ class Particle :
         _state = self.wld.canState(self.atom)    
         self.molecule = self.wld.canMolecule2(lambda x : self , _state.uncertainty,eliminator)
         self.wld.molecules.append(self.molecule)
+        self.molecule.initState()
         self.molecule.jumpable = True
         
     def activateTimejump(self) :

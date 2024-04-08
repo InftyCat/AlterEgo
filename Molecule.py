@@ -10,7 +10,7 @@ from BasicFunctions import Genus , e
     
         
 class Molecule :
-    def __init__ (self, _wld : World ,_eliminator, initSP , initUP) :             
+    def __init__ (self, _wld : World ,_eliminator, initSP , initUP) : #, initAreas = False) :             
         self.wld = _wld
         self.SP = initSP(self)
         self.UP = initUP(self)
@@ -18,6 +18,8 @@ class Molecule :
         self.jumpable = False
         self.state = State(_wld,self.SP.atom,self.UP.atom)
         self.eliminator = _eliminator
+        #if (initAreas) :
+         #   self.initState()
     def __str__(self) : 
         return str(self.SP) + "," + str (self.UP)
     def swapFocus(self) :
@@ -79,12 +81,12 @@ class Molecule :
                 self.wld.molecules.append(m)
                 m.draw()
                
-        anz =  len(self.wld.molecules)
-        print("eliminated molecule. Remaining : " ,anz)
-        if (anz > 0) :
-            print("next molecule:" , self.wld.mm())
-        else : 
-            print("You won!")
+            anz =  len(self.wld.molecules)
+            print("eliminated molecule. Remaining : " ,anz)
+            if (anz > 0) :
+                print("next molecule:" , self.wld.mm())
+            else : 
+                print("You won!")
     
     def draw(self) :
         

@@ -54,9 +54,9 @@ class World :
     def applyAss(self) :
         s = self.mm().subobject().atom
         bs = []
-        print("checking asses")
+        #print("checking asses")
         for i in self.implications : 
-            print(i)
+            #print(i)
             (a,b) = i
             
             if a.isBiggerThan(s) :
@@ -195,8 +195,9 @@ class World :
         #print("creating can Molecule")
         
         UP =  lambda mol: Particle.Particle(mol,uncAtom,Genus.Unc,_goalState)
+
         focus = Genus.Sub
-        return Molecule(self,_eliminator,SP , UP)
+        return Molecule(self,_eliminator,SP , UP) #,initAreas = True)
     def canMolecule ( self,_state ,_eliminator) :
         #self.state = State()
         #self.wld = _wld

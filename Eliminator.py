@@ -15,7 +15,7 @@ class Eliminator :
         self.frozenParticle = _frozenParticle
     def elim(self , s : State) :
     #    print("state now" , s)
-        print("try to eliminate")
+        #("try to eliminate")
         if (not isinstance(self.targetState,State)) : 
              print("typecheck fail")
              return None

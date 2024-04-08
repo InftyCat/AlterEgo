@@ -136,7 +136,7 @@ def monoIntro() :
     wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
     wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
     return wld
-wld = epiIntro() #kernelInc() #viererMono()
+wld = kernelInc() #viererMono() epiIntro() #
 wld.initialize()
 
 
