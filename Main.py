@@ -17,7 +17,7 @@ import State
 import Atom
 import BasicFunctions as Bsc
 from BasicFunctions import Helper
-
+from PolygoneWithalpha import create_alphaPoly
 
 #w =6
 tk = tkr.Tk()
@@ -82,7 +82,11 @@ tkr.Canvas.create_circle_arc = Area._create_circle_arc
 tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
 tkr.Canvas.createArea = Area._createArea 
-
+images = []
+def createPolygone(self, *args, **kwargs) : 
+    print("creating polygone")
+    return create_alphaPoly(self,tk,images,*args,**kwargs)
+tkr.Canvas.create_polygonWithAlpha = createPolygone
 def viererMono() :
 
     so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")

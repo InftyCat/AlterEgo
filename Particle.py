@@ -107,6 +107,7 @@ class Particle :
         return self.atom.room
     def initArea(self) :      
             self.area = self.getAreaFromAtom()
+            self.area.filled = self.genus == Genus.Sub
             #print("inited area" , self.area == None)
     def getGoalState(self) :
         """if (self.goalstate == None) :

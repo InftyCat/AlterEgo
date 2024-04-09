@@ -8,15 +8,18 @@ Created on Fri Mar 22 12:19:32 2024
 import Segment
 import BasicFunctions as Bsc
 import tkinter as tkr
+
 import Atom 
 class Area : 
-     def __init__ (self,_canvas,_c,_w,_exactHori = True)  :
+     def __init__ (self,_canvas,_c,_w,_exactHori = True,_filled =False)  :
          self.canvas = _canvas
          self.w = _w
          self.c = _c
          self.segments = []
          self.exactHori = _exactHori
          self.mp = None
+         self.filled = _filled
+         self.fillArea = None
      def create_segments (self,style, *kwargs,glue=False):
         #print(kwargs,len(kwargs))
         segs = [[kwargs[i], kwargs[i+1],kwargs[i+2],kwargs[i+3]] for i in range(0, len(kwargs)-2, 2)]
@@ -80,6 +83,13 @@ class Area :
             self.segments[i].dir = direct[i]
      def getPoints(self) : 
              return [s.src() for s in self.segments]     
+     def getPointsAsNumberList(self) : 
+         p = []
+         for s in self.segments :
+             (x,y) = s.src()
+             p = p + [round(x),round(y)]
+         print(p)
+         return p
      def drawPoints(self) : 
          for seg in self.segments :
              r = 10
@@ -87,8 +97,12 @@ class Area :
                  r = 20
              self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill="black")
      def drawSegments (self):
+        
         for seg in self.segments :
             seg.draw()
+        if self.filled :
+            
+            self.fillArea = self.canvas.create_polygonWithAlpha(*(self.getPointsAsNumberList()),fill="blue" , alpha=.5) #='#0070c080')"#ff000055")# #self.c,
      def segmentFromDirection(self , d) :
         self.generateDirections()
         l = list (filter(lambda s : Bsc.so(s.dir) == Bsc.so(d) , self.segments))
@@ -120,7 +134,8 @@ class Area :
              seg.erase()    
          if (self.mp != None) :
              self.canvas.delete(self.mp)
-         
+         if (self.filled) :
+             self.canvas.delete(self.fillArea)
          self.segments = []
          self.canvas.update()
   
@@ -285,3 +300,5 @@ def _create_circle_arcUL(self, x, y, r, **kwargs):
 
     kwargs["extent"] = 90 #kwargs.pop("end") - kwargs["start"]
     return self.create_arc(x, y-r, x+2*r, y+r, start = 90, style="arc", **kwargs)
+
+
