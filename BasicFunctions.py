@@ -7,6 +7,10 @@ Created on Fri Mar 22 12:22:39 2024
 """
 import random
 from enum import Enum
+class Helper(Enum) :
+    UseUncertaintyForAssumption = 1
+    EliminateToOtherMolecules = 2
+   
 class Genus(Enum) :
     Unc = 1
     Sub = 2

@@ -28,7 +28,12 @@ class Atom:
         #if self.genus == Genus.Unc :
         #    s = ""
         
-        return s +"_" + self.mdir + "_" + self.info
+        return s +"_" + self.showDirInf() #self.mdir + "_" + self.info
+    def showDirInf(self) :
+         s = self.mdir + "_"
+         if self.mdir == "" :
+              s = ""
+         return s + self.info
     def isKernel(self , exact,d) : 
         return ((self.info == Ker or ((d in exact) and self.info == Im)) and self.mdir == d) or self.info == Zero
     def __init__(self , _room , _mdir , _info) : #, _genus = Genus.Sub) :

@@ -24,9 +24,7 @@ originY = 100
 stdWidth = 300
 stdHeight = 300
 from enum import Enum
-class Helper(Enum) :
-    UseUncertaintyForAssumption = 1
-    
+ 
 def dirToMdir(d) :
         ds = ["S","O","SO"]
         mdir = [Verti,Hori,Diag]
@@ -41,9 +39,9 @@ def getSubList(istart,iend,ay) :
     if (iend <= istart) :
         segs2 = ay[istart:-1] + [ay[-1]] + ay[0:iend]
     return segs2
-
+stdHelper = [Helper.EliminateToOtherMolecules]   
 class World :
-    def __init__ (self,_canvas,_subobject,goalAtom, helperDict = []) :
+    def __init__ (self,_canvas,_subobject,goalAtom, helper = []) :
         self.canvas = _canvas
         self.areas = {} #{} #[[]]
         self.morphs = {}
@@ -51,14 +49,18 @@ class World :
         
         state = self.canState(_subobject)
         goalstate = self.canState(goalAtom)
-        elim =  elimFromGoalState(goalstate)
+        elim =  GoalStateEliminator(goalstate)
         self.molecules = [self.canMolecule(state,elim)]
         self.assCnt = 0
         self.implications = []                
-        self.helperDict = helperDict
+        #self.focus = 0
+        self.helper = stdHelper + helper
+    
     def applyAss(self) :
         s = self.mm().subobject().atom
+        u = self.mm().uncertainty().atom
         bs = []
+        bu = []
         #print("checking asses")
         for i in self.implications : 
             #print(i)
@@ -68,13 +70,26 @@ class World :
 
                 # one should be able to get to original state back
                 bs.append(b)
-        if (self.assCnt < len(bs)) :
-            
-                        
-            self.mm().updateStateFromSubobj(bs[self.assCnt])
+            if (b.info == Ker or b.info == Zero)  and a.isBiggerThan(u) and Helper.UseUncertaintyForAssumption in self.helper :
+                #print("lol")
+                bu.append(b)
+        if (self.assCnt < len(bs + bu)) :
+            l = len(bs)
+            if (self.assCnt < l) :        
+                self.mm().updateStateFromSubobj(bs[self.assCnt])
+            else :
+                print("Updating uncertainty by assumption")
+                self.mm().UP.updateAtom(bu[self.assCnt - l])
+                self.mm().draw()
             self.assCnt += 1
         else :
-            self.assCnt = 0
+            if self.assCnt > 0 :
+                self.assCnt = 0
+                self.applyAss()
+            
+
+    def getMMIndex(self) : 
+        return len(self.molecules) - 1
     def showMolecules(self) : 
         print("______________")
         for m in self.molecules :
@@ -104,8 +119,11 @@ class World :
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
     def swapFocus(self) :
         self.mm().swapFocus()
-    def finMM(self) :
-        self.mm().fin()
+    #def focusTo(idx : int) :
+
+    def finAll(self) :
+        for m in self.molecules :
+            m.fin()
     def genUnc(self,room, unc) :
             if room == unc :
                 return FullOrZeroAtom(room, Zero) # ,Unc)
@@ -151,6 +169,7 @@ class World :
     
         
     def createImg(self,x2,y2,x1,y1,unc=False):
+        #print("create img" , x2 , y2 , x1 , y1, unc)
         ax = self.areas[(x1,y1)]
         ay =self.areas[(x2,y2)]
         d = self.getDir(x1,y1,x2,y2)
@@ -160,10 +179,20 @@ class World :
         sidx = 0
         tidx = len(segs) - 1
         #print(segs)
-        while (not (Bsc.inList(segs[sidx].src() , ay.getPoints() , Bsc.comPnts))) :
+        abort = False
+        while (not (abort or Bsc.inList(segs[sidx].src() , ay.getPoints() , Bsc.comPnts))) :
             sidx +=1
+            if (sidx == len(segs)) : 
+                print("sidx Error!")
+                sidx -= 1
+                abort = True
+            
         while (not (Bsc.inList(segs[tidx].trg() , ay.getPoints() , Bsc.comPnts))) :
             tidx -=1
+            #if (tidx == 1 ) : 
+            #        print("tidx Error!")
+            #        break 
+        #print("test")
         segs = segs[sidx:tidx+1] #list(filter(lambda s : Bsc.inList(s.src() , ay.getPoints() , Bsc.comPnts) ,  ))
         xstart = (segs[0].x1,segs[0].y1)
         xend = (segs[-1].x2,segs[-1].y2)
@@ -200,6 +229,8 @@ class World :
             return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
     def jumpback(self) :
         self.mm().jumpback()
+    def erase(self,molc) : 
+        self.molecules.remove(molc)
     def canMolecule2 (self, SP ,  uncAtom , _eliminator) :
         _goalState = _eliminator.targetState
         #print("creating can Molecule")

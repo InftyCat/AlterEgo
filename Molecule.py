@@ -3,8 +3,9 @@ import Area
 import Particle #Genus, Particle
 from State import *
 import World
+
 from Eliminator import *
-from BasicFunctions import Genus , e
+from BasicFunctions import Genus , e , Helper
     #uncState = self.wld.canState(self.atom)    
 
     
@@ -16,12 +17,12 @@ class Molecule :
         self.UP = initUP(self)
         self.focus = Genus.Sub
         self.jumpable = False
-        self.state = State(_wld,self.SP.atom,self.UP.atom)
+        #self.state = State(_wld,self.SP.atom,self.UP.atom)
         self.eliminator = _eliminator
         #if (initAreas) :
          #   self.initState()
     def __str__(self) : 
-        return str(self.SP) + "," + str (self.UP)
+        return str(self.getState())
     def swapFocus(self) :
         self.focus = Particle.swapGenus(self.focus)
 
@@ -35,7 +36,7 @@ class Molecule :
         if (self.jumpable) : 
             #u = self.UP.atom
             if len(self.SP.history) == 0 :
-                print("History is empty! This should not happen")
+                print("History is empty!") # This should not happen")
             else :
                 #print(self.SP.history)
                 self.SP.jumpback()
@@ -65,19 +66,31 @@ class Molecule :
         return self.wld.canvas
     def getState(self) :
         return State(self.wld,self.subobject().atom , self.uncertainty().atom)
+    def checkFin(self) :
+        if Helper.EliminateToOtherMolecules in self.wld.helper :
+            for i in range (len(self.wld.molecules)) : 
+                if (i != self.wld.getMMIndex() ) :
+                    m = self.wld.molecules[i]
+                    if m.isBiggerThan(self) :
+                        print("Eliminated to another molecule")
+                        return []
+                    #todo
+        return self.eliminator.elim(self.getState())
     def fin(self) :
-        newM = self.eliminator.elim(self.getState())
-        if newM == None : 
-            print("Not finishable!")
-        else :
-            self.wld.molecules = self.wld.molecules[0:-2] 
+        #check wether other molecules have bigger goals and equal eliminators
+        newM = self.checkFin()
+        #if newM == None : 
+            #print("Not finishable!")
+        if newM != None :  #else :
+            self.wld.erase(self) 
             self.erase()
             for m in newM :
-                (s , gs) = m
+                (s , elim) = m
 
                 e(s , State)
-                e(gs , State)
-                m = self.wld.canMolecule(s,elimFromGoalState(gs))
+                e(elim , Eliminator)
+                m = self.wld.canMolecule(s,elim)
+                #m.history = elim.getNewHistory()
                 self.wld.molecules.append(m)
                 m.draw()
                
@@ -97,7 +110,7 @@ class Molecule :
         self.uncertainty().area.drawSegments() #Todo
     def update(self,state) :    
       #self.deleteState()
-      self.state = state
+      #self.state = state
       #print("State  is now" , state)
       self.SP.updateAtom(state.subobject)
       self.UP.updateAtom(state.uncertainty)
@@ -107,8 +120,8 @@ class Molecule :
         
         self.uncertainty().uncWedge(self.subobject().getRoom())
     def erase(self) :
-        self.SP.area.eraseSegments()
-        self.UP.area.eraseSegments() 
+        self.SP.erase()
+        self.UP.erase() 
     def updateStateFromSubobj(self,subobject : Atom) :
         self.subobject().updateAtom(subobject)
         self.updateUncFromSubObj()
@@ -133,7 +146,14 @@ class Molecule :
     def uncertainty(self) :
         return self.UP #state.uncertainty            
     
-
+    def isBiggerThan(self, other) :
+        b1 = False
+        if type(self.eliminator) == type(other.eliminator) : 
+            b1 = self.eliminator == other.eliminator
+        b2 = self.getState().isBiggerThan(other.getState())
+        ret = b1 and b2
+        print(self , " > " , other , " = " , b1 , " & " , b2 , " = " , ret)
+        return b1 and b2
     def drawAtom(self) :
         self.subobject().area.drawSegments() 
         self.subobject().area.drawMiddlepoint()

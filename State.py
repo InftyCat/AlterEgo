@@ -13,7 +13,7 @@ def genFullUnc (room) :
 
 class State :
     def __str__(self) :
-        return "(" + str(self.subobject) + "," + str(self.uncertainty) + ")"
+        return "(" + str(self.subobject) + "," + self.uncertainty.showDirInf() + ")" #self.uncertainty.mdir + "_" + self.uncertainty.info + ")"
     def __init__ (self,_wld,_subobject : Atom , _uncertainty : Atom) :
         self.wld = _wld
         self.subobject = _subobject

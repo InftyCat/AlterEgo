@@ -16,6 +16,7 @@ from Morphism import Mono, Epi
 import State
 import Atom
 import BasicFunctions as Bsc
+from BasicFunctions import Helper
 
 
 #w =6
@@ -80,14 +81,16 @@ tkr.Canvas.createRect = _createRect
 tkr.Canvas.create_circle_arc = Area._create_circle_arc
 tkr.Canvas.create_circle_arcDR = Area._create_circle_arcDR
 tkr.Canvas.create_circle_arcUL = Area._create_circle_arcUL
-tkr.Canvas.createArea = Area._createArea      
+tkr.Canvas.createArea = Area._createArea 
+
 def viererMono() :
 
     so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
     go =Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
-    helperDict = []
-    helperDict[World.UseUncertaintyForAssumption] = True
-    wld = World.World(canvas, so , go , helperDict)
+    
+    
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
 
     wld.addMorphism(0, 0,0, 1 ,Epi)
     wld.addMorphism(0, 0,1,0)
@@ -105,6 +108,35 @@ def viererMono() :
     wld.addMorphism(2, 1, 3, 1)
     wld.addMorphism(3,0,3,1,Mono)
     return wld
+
+def viererEpi() :
+
+    so =  Atom.FullOrZeroAtom((1,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =   Atom.Atom((1,1) , Atom.Verti, Atom.Im) 
+    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
+    
+    
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
+    #wld.mm().UP.updateAtom
+
+    wld.addMorphism(0, 0,0, 1 ,Epi)
+    wld.addMorphism(0, 0,1,0)
+    wld.addMorphism(1,0, 2, 0)
+
+    #wld.addArea(x, y)
+    wld.addMorphism(1, 0,1,1)
+    wld.addMorphism(0,1,1,1)
+    wld.addMorphism(1,1,2,1)
+
+
+    wld.addMorphism(2, 0, 3, 0)# ,Mono)
+    wld.addMorphism(2,0,2,1,Epi)
+
+    wld.addMorphism(2, 1, 3, 1)
+    wld.addMorphism(3,0,3,1,Mono)
+    return wld
+
 def epiIntro() :
     so =Atom.FullOrZeroAtom((1,0),"Full")
     go = Atom.Atom((1,0),Atom.Hori,Atom.Im)
@@ -138,7 +170,7 @@ def monoIntro() :
     wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
     wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
     return wld
-wld = kernelInc() #viererMono() epiIntro() #
+wld = viererEpi() #viererMono() epiIntro() #
 wld.initialize()
 
 
@@ -148,7 +180,7 @@ wld.mm().draw()
 chars = ['w','a','s','d','c','q',
         'f','x','p','j','m']
 funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , 
-         wld.applyAss , wld.finMM, wld.swapFocus , wld.jumpback, wld.showMolecules]
+         wld.applyAss , wld.finAll, wld.swapFocus , wld.jumpback, wld.showMolecules]
 
 
 

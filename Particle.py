@@ -3,9 +3,9 @@ from Atom import *
 from State import *
 import Area
 import Molecule
-import Eliminator
+from Eliminator import *
 import Moving
-from BasicFunctions import Genus
+from BasicFunctions import Genus, e
 #from Area import *
 
 
@@ -24,6 +24,7 @@ class Particle :
         self.frozen = False
         self.wld = _molecule.wld
         self.history = []
+        e(_molecule, Molecule.Molecule)
         self.molecule = _molecule
         self.area = None #self.initArea()
         
@@ -36,7 +37,8 @@ class Particle :
         _state = self.wld.canState(self.atom)    
         self.molecule = self.wld.canMolecule2(lambda x : self , _state.uncertainty,eliminator)
         self.wld.molecules.append(self.molecule)
-        self.molecule.initState()
+        self.molecule.UP.initArea()
+        #self.molecule.initState()
         self.molecule.jumpable = True
         
     def activateTimejump(self) :
@@ -84,15 +86,17 @@ class Particle :
         else :
             #print("unc wedge infty",self.atom)
             self.updateAtom(genFullUnc(r)) # self.updateState(State(self,))"""
-
+    def erase(self) : 
+        if self.area != None :
+            self.area.eraseSegments()
     def updateAtom(self,_atom : Atom,jumpback=False) :
         
         if (not jumpback) : 
             self.history.append(self.atom)
-        if self.area != None :
-            self.area.eraseSegments()
+
+        self.erase()
         self.atom = _atom 
-        #print("updated atom", self )
+
     def getRoom(self) :
         return self.atom.room
     def initArea(self) :      
@@ -109,13 +113,13 @@ class Particle :
         #todo
         self.frozen = True
         self.wld.molecules.remove(self.molecule)
-        self.molecule = [] 
         
-        el = Eliminator.elimFromFrozenAtom(self)
-        if (el != None) : 
+        el = FrozenAtomEliminator(self)
+        self.molecule = None
+        """if (el != None) : 
             print("constructed eliminator")
         else :
-            print("sth went wrong")
+            print("sth went wrong")"""
         print("Now frozen: ", self)
         return el
 
