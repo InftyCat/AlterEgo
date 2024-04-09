@@ -23,6 +23,10 @@ originX = 200
 originY = 100
 stdWidth = 300
 stdHeight = 300
+from enum import Enum
+class Helper(Enum) :
+    UseUncertaintyForAssumption = 1
+    
 def dirToMdir(d) :
         ds = ["S","O","SO"]
         mdir = [Verti,Hori,Diag]
@@ -39,7 +43,7 @@ def getSubList(istart,iend,ay) :
     return segs2
 
 class World :
-    def __init__ (self,_canvas,_subobject,goalAtom) :
+    def __init__ (self,_canvas,_subobject,goalAtom, helperDict = []) :
         self.canvas = _canvas
         self.areas = {} #{} #[[]]
         self.morphs = {}
@@ -51,6 +55,7 @@ class World :
         self.molecules = [self.canMolecule(state,elim)]
         self.assCnt = 0
         self.implications = []                
+        self.helperDict = helperDict
     def applyAss(self) :
         s = self.mm().subobject().atom
         bs = []
@@ -70,6 +75,11 @@ class World :
             self.assCnt += 1
         else :
             self.assCnt = 0
+    def showMolecules(self) : 
+        print("______________")
+        for m in self.molecules :
+            print (m)
+        print("______________")
     def morPropToImp(self) :
         epis = [ value for key, value in self.morphs.items() if value.prop== Morphism.Epi]
         monos = [value for key, value in self.morphs.items() if value.prop == Morphism.Mono]

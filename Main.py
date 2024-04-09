@@ -85,7 +85,9 @@ def viererMono() :
 
     so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
     go =Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
-    wld = World.World(canvas, so , go )
+    helperDict = []
+    helperDict[World.UseUncertaintyForAssumption] = True
+    wld = World.World(canvas, so , go , helperDict)
 
     wld.addMorphism(0, 0,0, 1 ,Epi)
     wld.addMorphism(0, 0,1,0)
@@ -143,9 +145,10 @@ wld.initialize()
 wld.drawAreas()
 wld.mm().draw()
 
-chars = ['w','a','s','d','c','q','f','x','p','j']
-funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , 
-         lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , wld.applyAss , wld.finMM, wld.swapFocus , wld.jumpback]
+chars = ['w','a','s','d','c','q',
+        'f','x','p','j','m']
+funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , 
+         wld.applyAss , wld.finMM, wld.swapFocus , wld.jumpback, wld.showMolecules]
 
 
 

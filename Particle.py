@@ -43,6 +43,7 @@ class Particle :
          if (not self.molecule.jumpable) :                     
                oldcoparticle = self.getCoParticle()
                eliminator = oldcoparticle.freeze()
+               print("freezing complete , adding molecule")
                self.generateMoleculeFromSub(eliminator) 
                print("now jumpable!")               
          else :
@@ -61,7 +62,7 @@ class Particle :
 
 
     def __str__(self) :
-        return str(self.genus) + "__" + str(self.atom) + "_Age : " + str(len(self.history)) #+ "_Id : " + str(id(self) )
+        return str(self.atom) #+ "_Id : " + str(id(self) ) #str(self.genus) + "__" +  #  "_Age : " + str(len(self.history))
     def move(self,forward, d) :
         mvg = Moving.Moving(self.wld,self)
         if forward :
@@ -107,6 +108,7 @@ class Particle :
     def freeze (self ) :
         #todo
         self.frozen = True
+        self.wld.molecules.remove(self.molecule)
         self.molecule = [] 
         
         el = Eliminator.elimFromFrozenAtom(self)
