@@ -17,7 +17,7 @@ import State
 import Atom
 import BasicFunctions as Bsc
 from BasicFunctions import Helper
-from PolygoneWithalpha import create_alphaPoly
+from PolygoneWithAlpha import create_alphaPoly
 
 #w =6
 tk = tkr.Tk()
@@ -185,6 +185,8 @@ def add3x3ToWld(wld,avoidRow=0) :
                             m = Mono
                         elif ((x+xi == 2 and xi == 1) or (y +yi == 2 and yi == 1) ) :
                             m = Epi
+                        if (xi == 1 and yi == 1) : 
+                            m = None
                         if (y == avoidRow and y+yi == avoidRow) : 
                             m = None
                         wld.addMorphism(x,y,x+xi,y+yi,m)
