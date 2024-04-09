@@ -22,7 +22,7 @@ class Molecule :
         #if (initAreas) :
          #   self.initState()
     def __str__(self) : 
-        return str(self.getState())
+        return str(self.getState()) + " , " + str(len(self.SP.history))
     def swapFocus(self) :
         self.focus = Particle.swapGenus(self.focus)
 
@@ -69,8 +69,8 @@ class Molecule :
     def checkFin(self) :
         if Helper.EliminateToOtherMolecules in self.wld.helper :
             for i in range (len(self.wld.molecules)) : 
-                if (i != self.wld.getMMIndex() ) :
-                    m = self.wld.molecules[i]
+                m = self.wld.molecules[i]
+                if (m != self) :
                     if m.isBiggerThan(self) :
                         print("Eliminated to another molecule")
                         return []
@@ -82,15 +82,18 @@ class Molecule :
         #if newM == None : 
             #print("Not finishable!")
         if newM != None :  #else :
-            self.wld.erase(self) 
+            self.wld.removeFromList(self) 
             self.erase()
+            self.wld.canvas.update()
             for m in newM :
                 (s , elim) = m
 
                 e(s , State)
                 e(elim , Eliminator)
                 m = self.wld.canMolecule(s,elim)
-                #m.history = elim.getNewHistory()
+                if (m != newM[-1]) : 
+                    m.SP.history = self.eliminator.getNewHistory()
+                    print("history of first particle updated to " , m.SP.printHistory())
                 self.wld.molecules.append(m)
                 m.draw()
                
@@ -100,6 +103,7 @@ class Molecule :
                 print("next molecule:" , self.wld.mm())
             else : 
                 print("You won!")
+            self.wld.canvas.update()
     
     def draw(self) :
         
@@ -122,6 +126,7 @@ class Molecule :
     def erase(self) :
         self.SP.erase()
         self.UP.erase() 
+        self.wld.canvas.update()
     def updateStateFromSubobj(self,subobject : Atom) :
         self.subobject().updateAtom(subobject)
         self.updateUncFromSubObj()
@@ -152,7 +157,7 @@ class Molecule :
             b1 = self.eliminator == other.eliminator
         b2 = self.getState().isBiggerThan(other.getState())
         ret = b1 and b2
-        print(self , " > " , other , " = " , b1 , " & " , b2 , " = " , ret)
+        #print(self , " > " , other , " = " , b1 , " & " , b2 , " = " , ret)
         return b1 and b2
     def drawAtom(self) :
         self.subobject().area.drawSegments() 

@@ -26,7 +26,7 @@ class State :
             b = myUnc.isDeeperThan(unc) 
             #print("try to compare States" , self , "<")
             ret = b and self.subobject.isBiggerThan(state.subobject)
-            print(self , " > " , state , "=" , ret)
+            #print(self , " > " , state , "=" , ret)
             return ret
          else : 
             print("Comparing error")

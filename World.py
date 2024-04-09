@@ -39,7 +39,7 @@ def getSubList(istart,iend,ay) :
     if (iend <= istart) :
         segs2 = ay[istart:-1] + [ay[-1]] + ay[0:iend]
     return segs2
-stdHelper = [Helper.EliminateToOtherMolecules]   
+stdHelper = [Helper.EliminateToOtherMolecules , Helper.UseUncertaintyForAssumption]   
 class World :
     def __init__ (self,_canvas,_subobject,goalAtom, helper = []) :
         self.canvas = _canvas
@@ -80,7 +80,7 @@ class World :
             else :
                 print("Updating uncertainty by assumption")
                 self.mm().UP.updateAtom(bu[self.assCnt - l])
-                self.mm().draw()
+                #self.mm().draw()
             self.assCnt += 1
         else :
             if self.assCnt > 0 :
@@ -122,7 +122,7 @@ class World :
     #def focusTo(idx : int) :
 
     def finAll(self) :
-        for m in self.molecules :
+        for m in self.molecules : #[::-1] :
             m.fin()
     def genUnc(self,room, unc) :
             if room == unc :
@@ -229,7 +229,7 @@ class World :
             return self.areas[(x1,y1)].comp(self.createImg(x2,y2,x1,y1),unc=unc)
     def jumpback(self) :
         self.mm().jumpback()
-    def erase(self,molc) : 
+    def removeFromList(self,molc) : 
         self.molecules.remove(molc)
     def canMolecule2 (self, SP ,  uncAtom , _eliminator) :
         _goalState = _eliminator.targetState
@@ -261,6 +261,7 @@ class World :
         for coords in self.areas.keys() :        
             self.areas[coords].drawSegments()
     def genMor(self,s,t,p) :
+        #print("generate" ,s , "-",  p , "->"  , t )
         return Morphism.Morphism(*s,*t,p,self.getMdir(*s , *t))
     def initialize(self) : 
         dr = []

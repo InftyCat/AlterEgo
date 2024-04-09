@@ -23,7 +23,7 @@ from BasicFunctions import Helper
 tk = tkr.Tk()
 frame = tkr.Frame(tk)
 frame.grid(row=0, column=0)
-canvas = tkr.Canvas(frame, width=1000, height=700)
+canvas = tkr.Canvas(frame, width=1000, height=800)
 canvas.grid(row=0,column=0)
 
 
@@ -86,7 +86,7 @@ tkr.Canvas.createArea = Area._createArea
 def viererMono() :
 
     so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
-    go =Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
+    go =Atom.FullOrZeroAtom((2,0),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
     
     helper = [Helper.UseUncertaintyForAssumption]
@@ -103,7 +103,7 @@ def viererMono() :
 
 
     wld.addMorphism(2, 0, 3, 0)# ,Mono)
-    wld.addMorphism(2,0,2,1,Mono)
+    wld.addMorphism(2,0,2,1)
 
     wld.addMorphism(2, 1, 3, 1)
     wld.addMorphism(3,0,3,1,Mono)
@@ -170,7 +170,32 @@ def monoIntro() :
     wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
     wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
     return wld
-wld = viererEpi() #viererMono() epiIntro() #
+def add3x3ToWld(wld,avoidRow=0) :
+    for x in range(0,3):
+        for y in range(0,3) :
+            for xi in range(0,2) :
+                for yi in range(0,2) :
+                    if (x + xi < 3 and y + yi < 3 and (xi > 0 or yi > 0)) :
+                        m = None
+                        if ((x == 0 and xi == 1) or (y == 0 and yi == 1)) :
+                            m = Mono
+                        elif ((x+xi == 2 and xi == 1) or (y +yi == 2 and yi == 1) ) :
+                            m = Epi
+                        if (y == avoidRow and y+yi == avoidRow) : 
+                            m = None
+                        wld.addMorphism(x,y,x+xi,y+yi,m)
+    
+def nineSurj() :
+    so = Atom.FullOrZeroAtom((2,0),"Full") 
+    go = Atom.Atom((2,0),Atom.Hori,Atom.Im)
+    """so = Atom.Atom((2,0),Atom.Verti,Atom.Ker)
+    go = Atom.FullOrZeroAtom((2,0),"Zero") """
+    wld = World.World(canvas,so,go)
+    add3x3ToWld(wld)
+    return wld
+
+    
+wld = nineSurj()# kernelInc() #epiIntro() #nineSurj() # epiIntro() #
 wld.initialize()
 
 
@@ -192,10 +217,10 @@ def key_pressed(event):
     if not wld.gameEnd()  :
         if (len(i) > 0) :
             funcs[i[0]]()
-            #print("Key pressed:", )
+            #print("Key pressed:", i[0])
 
 
-tk.title("Key Listener")
+tk.title("Diagram Chase")
 
 # Bind the key press event to the key_pressed function
 tk.bind("<Key>", key_pressed)

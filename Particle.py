@@ -44,15 +44,21 @@ class Particle :
     def activateTimejump(self) :
          if (not self.molecule.jumpable) :                     
                oldcoparticle = self.getCoParticle()
+               #self.history.append(self.atom)
                eliminator = oldcoparticle.freeze()
+               eliminator.setNewHistory(self.history + [self.atom])
                print("freezing complete , adding molecule")
                self.generateMoleculeFromSub(eliminator) 
-               print("now jumpable!")               
+               print("now jumpable!") # with history ") # , self.history)               
          else :
              print("sth fishy")
     
     
-         
+    def printHistory(self) : 
+        s = ""
+        for a in self.history : 
+            s += str(a) + ","
+        return s
     def jumpback(self) :
         if (len(self.history)==0) : 
             print(self , " : I have no history!")

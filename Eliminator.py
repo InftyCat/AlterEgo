@@ -1,6 +1,7 @@
 import Particle
 import Atom
 from State import *
+import copy
 from BasicFunctions import Genus , e
 #import State
 
@@ -26,7 +27,8 @@ class Eliminator :
                     self.frozenParticle.erase()
             return self.f(s) 
         else :
-            print("goal state is not bigger than s!" )
+            
+            #print("goal state is not bigger than s!" )
             return None #[(s , self.targetState)]
 
 class GoalStateEliminator(Eliminator): 
@@ -46,7 +48,7 @@ class FrozenAtomEliminator(Eliminator) :
          return self.frozenParticle == other.frozenParticle
     def __init__(self  ,  particle) : 
         self.frozenParticle = particle
-     
+        self.newHistory = []
 
         e(particle,Particle.Particle)
         full = Atom.FullOrZeroAtom(particle.getRoom(),Atom.Full)
@@ -68,5 +70,8 @@ class FrozenAtomEliminator(Eliminator) :
                     return [st ((patom , s.subobject ) , elim) , (st (patom , s.uncertainty ), GoalStateEliminator (st (patom , s.subobject )))]
             super().__init__(full ,f )
         return
+    def setNewHistory(self,nh) :
+         self.newHistory = copy.deepcopy(nh )
+         print("new history of eliminator : " , nh)
     def getNewHistory(self) :
-         return self.frozenParticle.history
+         return self.newHistory #frozenParticle.history
