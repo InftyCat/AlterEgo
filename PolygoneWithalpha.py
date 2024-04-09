@@ -2,12 +2,16 @@
 from tkinter import *
 from PIL import Image, ImageDraw, ImageTk
 #from PIL.ImageTk import PhotoImage
-def create_alphaPoly(self,root,images,*args, **kwargs):
+def hexToVec(hex) : 
+    h = hex.lstrip('#')
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+def create_alphaPoly(self,images,*args, **kwargs):
     if "alpha" in kwargs:         
         if "fill" in kwargs:
             # Get and process the input data
-            
-            fill = root.winfo_rgb(kwargs.pop("fill"))\
+            #print(kwargs["fill"])# = "blue"
+            #kwargs["fill"] = "#d466a1"
+            fill = hexToVec(kwargs.pop("fill"))\
                    + (int(kwargs.pop("alpha") * 255),)
             outline = kwargs.pop("outline") if "outline" in kwargs else None
 

@@ -88,7 +88,7 @@ class Area :
          for s in self.segments :
              (x,y) = s.src()
              p = p + [round(x),round(y)]
-         print(p)
+         #print(p)
          return p
      def drawPoints(self) : 
          for seg in self.segments :
@@ -102,7 +102,7 @@ class Area :
             seg.draw()
         if self.filled :
             
-            self.fillArea = self.canvas.create_polygonWithAlpha(*(self.getPointsAsNumberList()),fill="blue" , alpha=.5) #='#0070c080')"#ff000055")# #self.c,
+            self.fillArea = self.canvas.create_polygonWithAlpha(*(self.getPointsAsNumberList()),fill=self.c , alpha=0.5) #='#0070c080')"#ff000055")# #self.c,
      def segmentFromDirection(self , d) :
         self.generateDirections()
         l = list (filter(lambda s : Bsc.so(s.dir) == Bsc.so(d) , self.segments))
