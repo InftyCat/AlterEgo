@@ -53,9 +53,17 @@ class World :
         self.molecules = [self.canMolecule(state,elim)]
         self.assCnt = 0
         self.implications = []                
+        self.drawingConstraints = {}
         #self.focus = 0
         self.helper = stdHelper + helper
-    
+    def maximum (self,kwargs) :
+        xs = max ([x for (x,y) in kwargs]) #kwargs[::2]
+        ys =max ([y for (x,y) in kwargs]) #kwargs[1::2]
+        return (xs , ys)
+    def minimum (self,kwargs) :
+        xs = min ([x for (x,y) in kwargs]) #kwargs[::2]
+        ys =min ([y for (x,y) in kwargs]) #kwargs[1::2]
+        return (xs,ys)
     def applyAss(self) :
         s = self.mm().subobject().atom
         u = self.mm().uncertainty().atom
@@ -68,9 +76,9 @@ class World :
             
             if a.isBiggerThan(s) :
 
-                # one should be able to get to original state back
+                # one should be able to get to original state back TODO
                 bs.append(b)
-            if (b.info == Ker or b.info == Zero)  and a.isBiggerThan(u) and Helper.UseUncertaintyForAssumption in self.helper :
+            if (b.isKernel(self))  and a.isBiggerThan(u) and Helper.UseUncertaintyForAssumption in self.helper :
                 #print("lol")
                 bu.append(b)
         if (self.assCnt < len(bs + bu)) :
@@ -86,14 +94,25 @@ class World :
             if self.assCnt > 0 :
                 self.assCnt = 0
                 self.applyAss()
-            
+    def addCokernel(self ,x1, y1 ,x2 , y2) : 
+        """(x1,y1) = src
+        (x2,y2) = trg"""
+        print(x1,y1,x2,y2)
+        newpos = (2 * x2 - x1 , 2 * y2 - y1)
+        
 
+        self.addMorphism(x2,y2,*newpos,prop = Morphism.Epi,drawProp=True)
+    def addKernel(self,x1,y1,x2,y2) :
+        newPos = (2 * x1 - x2 , 2 * y1 - y2)
+        self.addMorphism(*newPos,x1,y1,prop= Morphism.Mono , drawProp=True)
+    def printMMHistory(self) :
+        print(self.mm().getHistory())
     def getMMIndex(self) : 
         return len(self.molecules) - 1
     def showMolecules(self) : 
         print("______________")
         for m in self.molecules :
-            print (m)
+            print (m)#,m.UP.printHistory())
         print("______________")
     def morPropToImp(self) :
         epis = [ value for key, value in self.morphs.items() if value.prop== Morphism.Epi]
@@ -107,18 +126,37 @@ class World :
         return self.mm().subobject().atom
     def move(self,forward,d) :
         self.mm().move(forward,d)
+        self.assCnt = 0
     def addArea(self,x,y,exactHori=True,c=None) :
+        #(x,y) = atom.room
+
         if (c == None) :
             c = Bsc.get_random_color()
         if (not (x,y) in self.areas) :
             #print(getWidth(x, y))
             self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),exactHori) #[(x,y)] = c #[x].append(a)
-    def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = ""):
+    def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False):
+        drawingConstraints = None
+        d = self.getMdir(xs,ys,xt,yt)
+       
+        if (drawProp and prop == Morphism.Mono) : 
+            
+            self.drawingConstraints[(xs,ys)] = (Atom.Atom((xt,yt) , d ,  Ker) )
+        
+        
         self.addArea(xs,ys)
+        if (drawProp) : 
+            if prop == Morphism.Epi :
+                trg = Atom.Atom((xs,ys) , d, Coker)
+                print("drawConstr : " , trg)
+                self.drawingConstraints[xt,yt] = trg           
+                #drawingConstraints = Atom.Atom(d)
         self.addArea(xt,yt)        
+
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
     def swapFocus(self) :
         self.mm().swapFocus()
+        print("swapping focus to" , self.mm().focus)
     #def focusTo(idx : int) :
 
     def finAll(self) :
@@ -166,10 +204,10 @@ class World :
     def into(self , x, y,allowdiag=True) :
         return [value.src() for key, value in self.morphs.items() if value.trg() == (x,y)  and (allowdiag or self.getDir(*value.src() , *value.trg()) != "SO") ]
     
-    
-        
+    def createCoker(self,x2,y2,x1,y1,unc= False) :
+        print("create coker" , x2 , y2 , x1 , y1, unc)
+        return self.areas[(x2,y2)].compQuotient(self.createImg(x2,y2,x1,y1),unc=unc)
     def createImg(self,x2,y2,x1,y1,unc=False):
-        #print("create img" , x2 , y2 , x1 , y1, unc)
         ax = self.areas[(x1,y1)]
         ay =self.areas[(x2,y2)]
         d = self.getDir(x1,y1,x2,y2)
@@ -219,7 +257,12 @@ class World :
                     
             return img        
     def createker(self,x1,y1,x2,y2,unc = False):
-        if (x1,y1) == (x2,y2) :
+        b = False
+        if (x1,y1) in self.drawingConstraints.keys() :
+            if self.drawingConstraints[(x1,y1)] == Atom.Atom((x2,y2) , self.getMdir(x1,y1,y2,y2) , Ker) :
+                b = True
+
+        if (x1,y1) == (x2,y2) or b :
            a = self.areas[(x1,y1)]
            zero = Area.Area(self.canvas,"black", a.w * 0.1 )
            for s in a.segments :
@@ -275,12 +318,12 @@ class World :
             curveUL = False
             #print(coords,o,i)
             if len(o) >= 2 :
-                t = Bsc.maximum(o)
+                t = self.maximum(o)
                 
                 curveDR = not (any(map(lambda s : self.genMor(s,t,Morphism.Epi).inList(self.morphs.values()) , o)))
                 
             if len(i) >= 2 :
-                s = Bsc.minimum(i)
+                s = self.minimum(i)
                 #print("lol",s)
                 curveUL = not (any(map(lambda t : self.genMor(s,t,Morphism.Mono).inList(self.morphs.values()), i)))
             if curveDR : 
@@ -309,8 +352,12 @@ class World :
             if (coords in ul) : st.append("NW")
             w = 6
             #print(coords,st)
-            self.areas[coords].initialize(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
-                       originY + y * (stdHeight / 2) -  w / 2* (x + y),
-                       stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),st)
+            if (coords in self.drawingConstraints.keys()) :
+                self.areas[coords] = self.drawingConstraints[coords].getArea(self)
+                print("adding area by constraint: " , self.drawingConstraints[coords])
+            else :
+                self.areas[coords].initialize(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
+                        originY + y * (stdHeight / 2) -  w / 2* (x + y),
+                        stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),st)
         self.mm().initState() 
         self.morPropToImp()
