@@ -57,14 +57,7 @@ def invert (dire) :
             return "W"
         return ''.join(map(invert,list(dire)))
 
-def maximum (kwargs) :
-    xs = max ([x for (x,y) in kwargs]) #kwargs[::2]
-    ys =max ([y for (x,y) in kwargs]) #kwargs[1::2]
-    return (xs , ys)
-def minimum (kwargs) :
-    xs = min ([x for (x,y) in kwargs]) #kwargs[::2]
-    ys =min ([y for (x,y) in kwargs]) #kwargs[1::2]
-    return (xs,ys)
+
 def comPnts(p1,p2) :
     #print(p1,p2)
     (x1,y1) = p1

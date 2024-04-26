@@ -14,13 +14,14 @@ class Eliminator :
         self.f = _f
         #self.frozenParticle = _frozenParticle
         #self.goalState = _
-    def elim(self , s : State) :
+    def elim(self , s : State , wld) :
     #    print("state now" , s)
         #("try to eliminate")
+        e(s , State)
         if (not isinstance(self.targetState,State)) : 
              print("typecheck fail")
              return None
-        if (self.targetState.isBiggerThan(s)) : 
+        if (self.targetState.isBiggerThan(wld, s)) : 
             if (isinstance(self,FrozenAtomEliminator)) :
                 if (self.frozenParticle != None) : 
                     print("Erasing segments of frozen particle")
@@ -28,16 +29,18 @@ class Eliminator :
             return self.f(s) 
         else :
             
-            #print("goal state is not bigger than s!" )
+            print("goal state is not bigger than s!" )
             return None #[(s , self.targetState)]
 
 class GoalStateEliminator(Eliminator): 
     def __init__(self , _targetState) : 
      self.goalState = _targetState
      super().__init__(_targetState , lambda s : [])
+    def __str__(self) :
+        return "[->"  + str(self.goalState) + "]" 
     def __eq__(self,other) : 
          return self.goalState == other.goalState
-    def getNewHistory(self) : 
+    def getNewHistory(self,gen : Genus) : 
          return []
 """def elimFromGoalState(goalstate) :
     e(goalstate , State)
@@ -46,6 +49,8 @@ class GoalStateEliminator(Eliminator):
 class FrozenAtomEliminator(Eliminator) : 
     def __eq__(self,other) : 
          return self.frozenParticle == other.frozenParticle
+    def __str__(self) : 
+         return "[°-> " + str(self.frozenParticle) + "]"
     def __init__(self  ,  particle) : 
         self.frozenParticle = particle
         self.newHistory = []
@@ -59,19 +64,28 @@ class FrozenAtomEliminator(Eliminator) :
         def st(sa , ua) : 
                     return State(wld , sa,ua)
 
+        compmaxState = State(wld , full , genFullUnc(particle.getRoom()) )
         if particle.genus == Genus.Unc :
-                compmaxState = State(wld , full , genFullUnc(particle.getRoom()) )
                 
                 f = lambda s : [( st(s.subobject , patom ) , elim) , (st(s.uncertainty , particle.atom), elim)]
                 super().__init__(compmaxState , f)
         elif particle.genus == Genus.Sub :
             def f (s : State) :
-                if s.subobject.atom.isKernel() :
-                    return [st ((patom , s.subobject ) , elim) , (st (patom , s.uncertainty ), GoalStateEliminator (st (patom , s.subobject )))]
-            super().__init__(full ,f )
+                print("try to eliminate." , s , wld)
+                if s.subobject.isKernel(wld) :
+                    ssub = s.subobject
+                    ssub.info = Atom.Ker
+                    return [(st (patom , ssub ) , elim) , (st (patom , s.uncertainty ), GoalStateEliminator (st (patom , ssub )))]
+                else :
+                    print("sorry you are not a kernel!")
+            super().__init__(compmaxState ,f )
         return
-    def setNewHistory(self,nh) :
-         self.newHistory = copy.deepcopy(nh )
-         print("new history of eliminator : " , nh)
-    def getNewHistory(self) :
-         return self.newHistory #frozenParticle.history
+    def setNewHistory(self,sh,uh) :
+         self.newSubHistory = copy.deepcopy(sh )
+         self.newUncHistory = copy.deepcopy(uh )
+         print("new history of eliminator : " , sh , " _ " ,uh)
+    def getNewHistory(self,gen : Genus) :
+        if gen == Genus.Sub :
+            return self.newSubHistory #frozenParticle.history
+        else :
+         return self.newUncHistory #frozenParticle.history

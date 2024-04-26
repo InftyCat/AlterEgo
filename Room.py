@@ -1,6 +1,6 @@
 import BasicFunctions as Bsc
 class Room :
-    def __init__ (self, _room=None ,_infty=False) :
+    def __init__ (self,  _room=None ,_infty=False) :
         
         self.room = _room
         self.infty = _infty
@@ -9,25 +9,31 @@ class Room :
               return "°"
          else :
               return "[" + str(self.room) + "]"
-    def wedge(self,room) :
+    def setToInfty(self) : 
+        self.infty = True
+        self.room = None
+    def wedge(self,wld,room) :
          if isinstance(room, Room) :
             if room.infty :
-                self.infty = True
-                self.room = None
+                self.setToInfty()
                 return
             else :
                  room = room.room
          #print(self.room,room)
          if not self.infty :
-                self.room = Bsc.maximum([self.room , room])
-    def isDeeperThan(self,room) :
+                m = wld.safeMax([self.room , room])
+                if (m != None) : 
+                     self.room = m
+                else :                
+                     self.setToInfty()
+    def isDeeperThan(self,wld,room) :
          if (self.infty) :
               return True
          else :
                 if (room.infty) : 
                    return False
                 else :
-                     return Bsc.maximum([room.room,self.room]) == self.room
+                     return wld.maximum([room.room,self.room]) == self.room
 """def wedge(self, room) :
         if (self.genus == Genus.Unc) :
             self.room.wedge(room)

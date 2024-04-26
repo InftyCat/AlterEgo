@@ -199,9 +199,63 @@ def nineSurj() :
     wld = World.World(canvas,so,go)
     add3x3ToWld(wld)
     return wld
+def snakeConstruction() :
+    so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =   Atom.FullOrZeroAtom((0,2),"Full") #Atom.Atom((0,2) , Atom.Verti, Atom.Im) 
+    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
+    
+    
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
+    #wld.mm().UP.updateAtom
+
+    wld.addMorphism(0, 0,0, 1)
+    wld.addMorphism(0, 0,1,0)
+    wld.addMorphism(1,0, 2, 0,Epi)
+
+    #wld.addArea(x, y)
+    wld.addMorphism(1, 0,1,1)
+    wld.addMorphism(0,1,1,1,Mono)
+    wld.addMorphism(1,1,2,1)
+
 
     
-wld = nineSurj()# kernelInc() #epiIntro() #nineSurj() # epiIntro() #
+    wld.addMorphism(2,0,2,1)
+
+    wld.addMorphism(0,1,0,2,Epi)
+    
+    
+    return wld
+def cokernelFactorization() :
+    so =  Atom.FullOrZeroAtom((2,0),"Full") #Atom.Atom((2,0),Atom.Verti,Atom.Ker) #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =   Atom.FullOrZeroAtom((2,1),"Full") #Atom.Atom((0,2) , Atom.Verti, Atom.Im) 
+    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
+    
+    
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
+    #wld.mm().UP.updateAtom
+
+    wld.addMorphism(0, 0,0, 1)
+    wld.addMorphism(0, 0,1,0,extra = [Atom.Coker])
+    
+    
+
+    #wld.addArea(x, y)
+    wld.addMorphism(1, 0,1,1)
+    wld.addMorphism(0,1,1,1,extra = [Atom.Coker])
+    
+    return wld
+def arrow() :
+    so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =  Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
+
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
+    wld.addMorphism(0, 0,0, 1,[Atom.Coker] )
+    
+    return wld
+wld = cokernelFactorization() # arrow() # epiIntro() #monoIntro() #snakeConstruction()#kernelInc() #nineSurj() # epiIntro() #
 wld.initialize()
 
 
@@ -209,9 +263,9 @@ wld.drawAreas()
 wld.mm().draw()
 
 chars = ['w','a','s','d','c','q',
-        'f','x','p','j','m']
+        'f','x','p','j','m','h']
 funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , 
-         wld.applyAss , wld.finAll, wld.swapFocus , wld.jumpback, wld.showMolecules]
+         wld.applyAss , wld.finAll, wld.swapFocus , wld.jumpback, wld.showMolecules , wld.printMMHistory]
 
 
 

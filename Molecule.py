@@ -22,7 +22,7 @@ class Molecule :
         #if (initAreas) :
          #   self.initState()
     def __str__(self) : 
-        return str(self.getState()) + " , " + str(len(self.SP.history))
+        return str(self.getState()) #+ " , " +  str(self.eliminator) #) str(len(self.SP.history))
     def swapFocus(self) :
         self.focus = Particle.swapGenus(self.focus)
 
@@ -41,6 +41,7 @@ class Molecule :
                 #print(self.SP.history)
                 self.SP.jumpback()
                 if len(self.subobject().history) == 0 :
+                    print("Because I have no history (anymore), I am not jumpable anymore")
                     self.jumpable = False
                 
 
@@ -55,6 +56,7 @@ class Molecule :
 
     def move(self,forward,d) : #todo
         self.jumpable = False
+        self.focus = Genus.Sub
         hasMoved = self.SP.move(forward,d)
         if hasMoved :
         # think of erasing subobjects if uncertainty is full
@@ -75,7 +77,19 @@ class Molecule :
                         print("Eliminated to another molecule")
                         return []
                     #todo
-        return self.eliminator.elim(self.getState())
+        return self.eliminator.elim(self.getState(),self.wld)
+    def getHistory(self) :
+        sh = self.SP.history 
+        uh = self.UP.history
+        if len(sh) == len(uh) :
+            l = len(self.SP.history)
+            s = ""
+            for i in range(l) :
+                s += str(State(self.wld, sh[i] ,uh[i])) + " ; "
+            return s
+        else :
+            return self.SP.printHistory() + " | " + self.UP.printHistory()
+
     def fin(self) :
         #check wether other molecules have bigger goals and equal eliminators
         newM = self.checkFin()
@@ -92,8 +106,9 @@ class Molecule :
                 e(elim , Eliminator)
                 m = self.wld.canMolecule(s,elim)
                 if (m != newM[-1]) : 
-                    m.SP.history = self.eliminator.getNewHistory()
-                    print("history of first particle updated to " , m.SP.printHistory())
+                    m.SP.history = self.eliminator.getNewHistory(Genus.Sub)
+                    m.UP.history = self.eliminator.getNewHistory(Genus.Unc)
+                    print("history of first molecule updated to " , m.getHistory())
                 self.wld.molecules.append(m)
                 m.draw()
                
@@ -155,7 +170,7 @@ class Molecule :
         b1 = False
         if type(self.eliminator) == type(other.eliminator) : 
             b1 = self.eliminator == other.eliminator
-        b2 = self.getState().isBiggerThan(other.getState())
+        b2 = self.getState().isBiggerThan(self.wld, other.getState())
         ret = b1 and b2
         #print(self , " > " , other , " = " , b1 , " & " , b2 , " = " , ret)
         return b1 and b2

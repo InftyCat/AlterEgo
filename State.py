@@ -19,11 +19,11 @@ class State :
         self.subobject = _subobject
         self.uncertainty = _uncertainty
         #print("inited" , _subobject,_uncertainty)
-    def isBiggerThan(self,state) :
+    def isBiggerThan(self,wld,state) :
          if (isinstance(state,State)) :
             myUnc = self.uncertainty.getKernelRoom()
             unc = state.uncertainty.getKernelRoom()
-            b = myUnc.isDeeperThan(unc) 
+            b = myUnc.isDeeperThan(wld,unc) 
             #print("try to compare States" , self , "<")
             ret = b and self.subobject.isBiggerThan(state.subobject)
             #print(self , " > " , state , "=" , ret)

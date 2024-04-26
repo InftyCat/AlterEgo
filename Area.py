@@ -162,6 +162,54 @@ class Area :
                return l[0]
            else :
                return -1
+     def compQuotient(self , sub) : # unc is always false, the uncertainty is never a cokernel
+        # print("creating compquotient" , self , sub)
+     
+         
+         w = self.w * 1.5
+         c = self.c
+        
+         comp = Area(self.canvas,c,w )
+         i = 0
+         idx = sub.getSegIdxByTrg(self.segments[i].trg())
+        
+         
+         while (idx != -1) :       # finding first self-segment not contained in sub                  
+             i += 1
+             idx = sub.getSegIdxByTrg(self.segments[i].trg())
+          
+         comp.stealSegment(self.segments[i])
+         while (idx == -1) :
+             
+             comp.stealSegment(self.segments[i])
+             i += 1
+             idx = sub.getSegIdxByTrg(self.segments[i].src())
+          #   print("i,idx",i,idx)
+         
+         j = self.getSegIdxBySrc(sub.segments[idx].src())
+         #print("j,idx",j,idx)
+         
+         comp.stealSegment(sub.segments[idx].invert()) 
+         #print("j,idx",j,idx)
+         #j = self.getSegIdxBySrc(quot.segments[idx].src())
+         idx -= 1
+            
+         while (j == -1) :
+            
+            comp.stealSegment(sub.segments[idx].invert()) 
+            
+            #print("j,idx",j,idx)
+            j = self.getSegIdxBySrc(sub.segments[idx].src())
+            idx -= 1
+            
+         """   
+            
+         if nunc :
+             for i in range(j,len(self.segments)) :             
+                comp.stealSegment(self.segments[i])
+                """
+         return comp
+        
      def comp (self, quot,unc=False) :
          
          w = self.w * 1.5

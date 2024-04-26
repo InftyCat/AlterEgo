@@ -28,15 +28,15 @@ class Moving :
 
         
         #print("uncRoom",uncRoom)
-        s = self.molecule.atom #self.wld.subobjectAtom()
+        s : Atom= self.molecule.atom #self.wld.subobjectAtom()
         r = Atom.Atom(s.room, d,Ker).getCoRoom()
         uncRoom  = r
         
         
         #print("forward...",r,self.wld.areas.keys())
-        if (r in self.wld.areas.keys()) :
-            exact = self.wld.areas[s.room].exactList()
-            if (s.isKernel(exact,d)):
+        if (s.room+r in self.wld.morphs.keys()) :
+            
+            if (s.isKernel(self.wld,d)):
                 self.molecule.updateAtom(Atom.FullOrZeroAtom(r, Zero)) #updateSubobject(
                 
             else :
@@ -56,7 +56,8 @@ class Moving :
         s = self.wld.subobjectAtom()
         room = Atom.Atom(s.room, d,Im).getCoRoom()
         exact = self.wld.areas[s.room].exactList()
-        if (room in self.wld.areas.keys()) :
+        #print(room,s.room,self.wld.morphs.keys())
+        if (room + s.room in self.wld.morphs.keys()) : #room in self.wld.areas.keys() and 
             
             if ((s.info == Im or (s.info == Ker and d in exact)) and s.mdir == d) :
                 self.molecule.updateAtom(Atom.FullOrZeroAtom(room,Full))

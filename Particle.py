@@ -46,10 +46,11 @@ class Particle :
                oldcoparticle = self.getCoParticle()
                #self.history.append(self.atom)
                eliminator = oldcoparticle.freeze()
-               eliminator.setNewHistory(self.history + [self.atom])
+               eliminator.setNewHistory(self.history + [self.atom],oldcoparticle.history)
+               self.genus = Genus.Sub
                print("freezing complete , adding molecule")
                self.generateMoleculeFromSub(eliminator) 
-               print("now jumpable!") # with history ") # , self.history)               
+               print(self.genus , " now jumpable!") # with history ") # , self.history)               
          else :
              print("sth fishy")
     
@@ -84,7 +85,7 @@ class Particle :
          return self.molecule.getParticleFromGenus(cogenus)
     def uncWedge(self,r) :
         ur = self.getUncCoRoom()
-        ur.wedge(r)
+        ur.wedge(self.wld,r)
         
         if not ur.infty :
 #            self.updateSubob
@@ -106,8 +107,11 @@ class Particle :
     def getRoom(self) :
         return self.atom.room
     def initArea(self) :      
-            self.area = self.getAreaFromAtom()
-            self.area.filled = self.genus == Genus.Sub
+            self.area = self.getArea()
+            if self.genus == Genus.Sub :
+                self.area.filled = True#
+                #leave it as it is otherwise
+                #= self.genus == Genus.Sub
             #print("inited area" , self.area == None)
     def getGoalState(self) :
         """if (self.goalstate == None) :
@@ -132,29 +136,13 @@ class Particle :
 
     def getUncCoRoom(self) : 
         return self.atom.getKernelRoom(self.genus == Genus.Unc)
-        
-    def getAreaFromAtom(self) : 
+    
+    def getArea(self) : 
         
         atom = self.atom
         if self.genus == Genus.Sub :
         #atom = self.subobject()
-            (x1,y1) = atom.room
-            
-            (x2,y2) = atom.getCoRoom()
-            #print(".",atom,(x1,y1),(x2,y2))
-            #print(x1,y1,x2,y2)
-            if atom.info == Ker :     
-                return self.wld.createker(x1,y1,x2,y2)
-            elif atom.info == Im :
-                return self.wld.createImg(x1,y1,x2,y2)
-            elif atom.info == Full :
-                full = Area.Area(self.wld.canvas,self.wld.areas[(x1,y1)].c,15)
-                for s in self.wld.areas[(x1,y1)].segments : full.stealSegment(s)
-                return full
-            elif atom.info == Atom.Zero:
-                zero = Area.Area(self.wld.canvas,"black",3)
-                for s in self.wld.areas[(x1,y1)].segments : zero.stealSegment(s)
-                return zero
+            return atom.getArea(self.wld)
         elif  self.genus == Genus.Unc :
                    
         #atom = self.uncertainty()
@@ -168,7 +156,7 @@ class Particle :
                 
                 #print("uncarea now infty")
                 a = self.wld.areas[(x1,y1)]
-                full = Area.Area(self.wld.canvas,"black",a.w * 2)
+                full = Area.Area(self.wld.canvas,"#000000",a.w * 2,_filled=True)
                 for s in a.segments : full.stealSegment(s)
                 return full
         

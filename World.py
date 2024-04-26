@@ -18,13 +18,14 @@ from Atom import Ker , Im ,  Full , Hori , Verti , Diag
 import Atom
 from Molecule import *
 
+
 from Room import *
 originX = 200
 originY = 100
 stdWidth = 300
 stdHeight = 300
 from enum import Enum
- 
+
 def dirToMdir(d) :
         ds = ["S","O","SO"]
         mdir = [Verti,Hori,Diag]
@@ -56,9 +57,26 @@ class World :
         self.drawingConstraints = {}
         #self.focus = 0
         self.helper = stdHelper + helper
-    def maximum (self,kwargs) :
+    def existsCompMorphs(self,s,t)  -> bool :
+        sout = self.out(*s)
+        if (s == t) : 
+            return True
+        if (len(sout) == 0) :
+            return False
+        else :            
+            return any (map (lambda s2 : self.existsCompMorphs(s2,t), sout))
+        
+ 
+    def safeMax(self,kwargs) :# returns None if the 
+        m = self.maximum(kwargs)
+        for p in kwargs :
+            if not self.existsCompMorphs(p , m) :
+                return None
+        return m
+    def maximum (self,kwargs) : 
         xs = max ([x for (x,y) in kwargs]) #kwargs[::2]
         ys =max ([y for (x,y) in kwargs]) #kwargs[1::2]
+        
         return (xs , ys)
     def minimum (self,kwargs) :
         xs = min ([x for (x,y) in kwargs]) #kwargs[::2]
@@ -135,7 +153,8 @@ class World :
         if (not (x,y) in self.areas) :
             #print(getWidth(x, y))
             self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),exactHori) #[(x,y)] = c #[x].append(a)
-    def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False):
+    
+    def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False, extra = []) :
         drawingConstraints = None
         d = self.getMdir(xs,ys,xt,yt)
        
@@ -148,12 +167,16 @@ class World :
         if (drawProp) : 
             if prop == Morphism.Epi :
                 trg = Atom.Atom((xs,ys) , d, Coker)
-                print("drawConstr : " , trg)
+                #print("drawConstr : " , trg)
                 self.drawingConstraints[xt,yt] = trg           
                 #drawingConstraints = Atom.Atom(d)
         self.addArea(xt,yt)        
 
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
+        if Coker in extra : 
+            self.addCokernel(xs,ys,xt,yt)
+        if Ker in extra :
+            self.addKernel(xs,ys,xt,yt)
     def swapFocus(self) :
         self.mm().swapFocus()
         print("swapping focus to" , self.mm().focus)
@@ -204,9 +227,9 @@ class World :
     def into(self , x, y,allowdiag=True) :
         return [value.src() for key, value in self.morphs.items() if value.trg() == (x,y)  and (allowdiag or self.getDir(*value.src() , *value.trg()) != "SO") ]
     
-    def createCoker(self,x2,y2,x1,y1,unc= False) :
-        print("create coker" , x2 , y2 , x1 , y1, unc)
-        return self.areas[(x2,y2)].compQuotient(self.createImg(x2,y2,x1,y1),unc=unc)
+    def createCoker(self,x2,y2,x1,y1) :
+        #print("create coker" , x2 , y2 , x1 , y1)
+        return self.areas[(x2,y2)].compQuotient(self.createImg(x2,y2,x1,y1))
     def createImg(self,x2,y2,x1,y1,unc=False):
         ax = self.areas[(x1,y1)]
         ay =self.areas[(x2,y2)]
@@ -354,7 +377,7 @@ class World :
             #print(coords,st)
             if (coords in self.drawingConstraints.keys()) :
                 self.areas[coords] = self.drawingConstraints[coords].getArea(self)
-                print("adding area by constraint: " , self.drawingConstraints[coords])
+                #print("adding area by constraint: " , self.drawingConstraints[coords])
             else :
                 self.areas[coords].initialize(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
                         originY + y * (stdHeight / 2) -  w / 2* (x + y),
