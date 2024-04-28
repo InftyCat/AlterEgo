@@ -59,7 +59,7 @@ class Atom:
             (x2,y2) = self.getCoRoom()
             #print(".",self,(x1,y1),(x2,y2))
             if self.info == Ker :     
-                print("KER",x1,y1,x2,y2)
+                #print("KER",x1,y1,x2,y2)
                 return wld.createker(x1,y1,x2,y2)
             elif self.info == Im :
                 return wld.createImg(x1,y1,x2,y2)

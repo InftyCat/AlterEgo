@@ -25,6 +25,8 @@ class Area :
          self.initFracs()
          self.width = _width
          self.height = _height
+         self.x = None
+         self.y = None
      def addSub(self, d, frac) :
          if (d == Atom.Hori) :
              self.leftFrac = frac
@@ -291,10 +293,12 @@ class Area :
 
         self.initRightFrac()
         self.downFrac = 1 - self.upFrac
-     def initialize(self,x,y,width,height,arcs) :
+     def initialize(self,x,y,width,height,arcs) : # width height werden nochmal übergeben, wegen width changes.
       # this function draws the segments starting from leftFrac and upFrac.
         _min= min(width,height)
         #print(arcs)
+        self.x = x
+        self.y = y
         leftFrac2 = self.leftFrac
         upFrac2 = self.upFrac
         
@@ -391,7 +395,13 @@ class SubArea(Area) :
         self.frac = _frac
         super().__init__(_canvas,_c,_w,_exactHori,_filled)
         _superArea.addSub(_d,_frac)
-    def subInitialize(self) :
-        
-        super().initialize()
+    def subInitialize(self,st) :
+        if (self.d == Atom.Hori) : 
+            wi = self.superArea.width * self.frac
+            hi = self.superArea.height
+        else : 
+            wi = self.superArea.width
+            hi = self.superArea.height * self.frac 
+        print(wi,hi)
+        super().initialize(self.superArea.x,self.superArea.y,wi,hi,st)
         #todo

@@ -74,7 +74,7 @@ class World :
             
         if (not (x,y) in self.areas) :
             #print(x,y,c)
-            #print("addArea" , x,y)
+            print("addArea" , x,y)
             #print(getWidth(x, y))
             self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),width,height,exactHori) #[(x,y)] = c #[x].append(a)
     def addSubArea(self,room,subRoom,d,frac,c=None) :
@@ -84,11 +84,11 @@ class World :
     def addSES(self,room,d,frac,c=None) :
        if not (room in self.areas.keys()) : 
            if d == Hori : 
-               wi = 1 * stdWidth # *1.5
+               wi = stdWidth # *1.5
                he = stdHeight
            else :
                wi = stdWidth
-               he = 1  * stdHeight#* 1.5
+               he = stdHeight #* 1.5
            self.addArea(*room,width=wi,height=he)
        subRoom = Atom.Atom(room, d,Im).getCoRoom()  
        self.addSubArea(room,subRoom,d,frac,c)
@@ -371,7 +371,9 @@ class World :
 
     
     def drawAreas(self) :
-        for coords in self.areas.keys() :        
+        for coords in self.areas.keys() :
+            #print("drawing", coords,len(self.areas[coords].segments))
+           
             self.areas[coords].drawSegments()
     def genMor(self,s,t,p) :
         #print("generate" ,s , "-",  p , "->"  , t )
@@ -431,8 +433,9 @@ class World :
                 #print("adding area by constraint: " , self.drawingConstraints[coords])
             else :
                 a = self.areas[coords]
-                if (isinstance(a,Area.SubArea))                 : 
-                    a.subInitialize()
+                if (isinstance(a,Area.SubArea))     :
+                    #äprint("subinit")
+                    a.subInitialize(st)
                 else :
                     insWidth = 0
                     insHeight = 0

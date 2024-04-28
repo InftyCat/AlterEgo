@@ -247,7 +247,7 @@ def cokernelFactorization() :
     
     return wld
 def arrow() :
-    so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    so =  Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,0),"Full") #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
     go =  Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
 
     helper = [Helper.UseUncertaintyForAssumption]
@@ -263,12 +263,15 @@ def obj() :
     wld.addArea(1,0)
     return wld
 def ses() :
-    so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
-    go =  Atom.FullOrZeroAtom((2,0),"Zero") # #Atom.Atom((2,0) , Atom.Verti, Atom.Im)  
+    so =  Atom.FullOrZeroAtom((0,0),"Zero") # #Atom.Atom((2,0) , Atom.Verti, Atom.Im)  
+    go =  Atom.FullOrZeroAtom((-1,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
     wld = World.World(canvas, so , go)
-    wld.addSES((1,0),Hori,1/3)
+    #wld.addArea(0,0)
+    #wld.addSubArea((0,0),(-1,0),Hori,1/3)
+    #wld.addMorphism(-1,0,0,0,prop=Mono)
+    wld.addSES((0,0),Hori,1/3)
     return wld
-wld = arrow() # cokernelFactorization() #  epiIntro() #obj() # snakeConstruction()# arrow() # kernelInc() #nineSurj() # 
+wld = ses() # ses() # cokernelFactorization() #  epiIntro() #obj() # snakeConstruction()# arrow() # kernelInc() #nineSurj() # 
 wld.initialize()
 
 
