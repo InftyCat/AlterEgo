@@ -89,7 +89,7 @@ def createPolygone(self, *args, **kwargs) :
 tkr.Canvas.create_polygonWithAlpha = createPolygone
 def viererMono() :
 
-    so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) # Atom.FullOrZeroAtom((2,0),"Full")
+    so = Atom.FullOrZeroAtom((2,0),"Full")# Atom.Atom((2,0),Atom.Verti,Atom.Ker) 
     go =Atom.FullOrZeroAtom((2,0),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
     
@@ -252,9 +252,15 @@ def arrow() :
 
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
-    #wld.addMorphism(0, 0,0, 1)# ,[Atom.Ker] )
+    wld.addMorphism(0, 0,0, 1 ,extra = [Atom.Coker] )
+    
+    return wld
+def obj() : 
+    so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =  Atom.FullOrZeroAtom((1,0),"Zero") # #Atom.Atom((2,0) , Atom.Verti, Atom.Im)  
+    wld = World.World(canvas, so , go)
     wld.addArea(0,0)
-    wld.addArea(0,1)
+    wld.addArea(1,0)
     return wld
 def ses() :
     so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
@@ -262,13 +268,13 @@ def ses() :
     wld = World.World(canvas, so , go)
     wld.addSES((1,0),Hori,1/3)
     return wld
-wld = epiIntro() # arrow() #cokernelFactorization() #  snakeConstruction()# arrow() # kernelInc() #nineSurj() # epiIntro() #
+wld = arrow() # cokernelFactorization() #  epiIntro() #obj() # snakeConstruction()# arrow() # kernelInc() #nineSurj() # 
 wld.initialize()
 
 
 wld.drawAreas()
 
-#wld.mm().draw()
+wld.mm().draw()
 
 chars = ['w','a','s','d','c','q',
         'f','x','p','j','m','h']

@@ -70,11 +70,11 @@ class World :
         #(x,y) = atom.room
         
         if (c == None) :
-            c = Bsc.get_random_color()
+            c =Bsc.get_random_color()
             
         if (not (x,y) in self.areas) :
-            print(c)
-            print("addArea" , x,y)
+            #print(x,y,c)
+            #print("addArea" , x,y)
             #print(getWidth(x, y))
             self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),width,height,exactHori) #[(x,y)] = c #[x].append(a)
     def addSubArea(self,room,subRoom,d,frac,c=None) :
@@ -211,6 +211,7 @@ class World :
 
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
         if Coker in extra : 
+            print("adding cokernel")
             self.addCokernel(xs,ys,xt,yt)
         if Ker in extra :
             self.addKernel(xs,ys,xt,yt)
@@ -448,8 +449,9 @@ class World :
                             x2 -=1
                         a = self.areas[(x2,y2)] 
                         insHeight += a.height * (a.downFrac)
-                    a.initialize(originX + insWidth -  w / 2 * (x +y),
+                    
+                    self.areas[coords].initialize(originX + insWidth -  w / 2 * (x +y),
                             originY + insHeight -  w / 2* (x + y),
                             a.width +  w  * (x +y)  ,a.height +  w  * (x +y),st)
-        #self.mm().initState() error
+        self.mm().initState() 
         self.morPropToImp()

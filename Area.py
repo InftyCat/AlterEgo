@@ -12,11 +12,11 @@ import tkinter as tkr
 import Atom 
 
 class Area : 
-     def __init__ (self,_canvas,_c,_w,_width , _height,_exactHori = True,_filled =False, )  :
+     def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, )  :
          self.canvas = _canvas
          self.w = _w
          self.c = _c
-         print("init:",self.c)
+        # print("init:",self.c)
          self.segments = []
          self.exactHori = _exactHori
          self.mp = None
@@ -40,7 +40,7 @@ class Area :
         #print(kwargs,len(kwargs))
         segs = [[kwargs[i], kwargs[i+1],kwargs[i+2],kwargs[i+3]] for i in range(0, len(kwargs)-2, 2)]
         #directs = ["N"]
-        
+      
         for i in range(len(segs)) :
             #print("start",i)
             if (segs[i][0],segs[i][1]) != (segs[i][2],segs[i][3]) :
@@ -56,6 +56,7 @@ class Area :
         s = seg.copy()
         s.c = self.c
         s.w = self.w #*= 1.5
+        #print("stealing a segment from len", len(self.segments) , ":" , s)
         self.segments.append(s)                    
      def generateDirections(self) :
         direct= []
@@ -114,6 +115,7 @@ class Area :
              self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill=self.c)
      def drawSegments (self):
         
+        #print("number of segs to draw", len(self.segments))
         for seg in self.segments :
             seg.draw()
         if self.filled :
@@ -295,6 +297,8 @@ class Area :
         #print(arcs)
         leftFrac2 = self.leftFrac
         upFrac2 = self.upFrac
+        if (self.segments != [] and False) :
+            print("segments are nonempty before")
         self.create_segments("line",    x+ width - leftFrac2*_min ,y, x+width , y)
         st = "line"
         if ("NO" in arcs) :
@@ -323,7 +327,7 @@ class Area :
         
         self.createArc( x ,y + _min * self.upFrac,x + _min * self.leftFrac,y,st)
         self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
-        self.drawPoints()
+        #self.drawPoints()
                         
 def isSpecialArc(style,x1,y1,x2,y2):
         return style != "line" and x1 == x2
@@ -361,6 +365,8 @@ def _createArea(self,x,y,width,height,c,w,exactHori, *arcs):
 
     
     a= Area(self,_c=c,_w=w)
+    if (a.segments != []) :
+            raise Exception("segments are nonempty before!!!")
     a.initialize(x, y, width, height, *arcs)
             
 
@@ -387,6 +393,6 @@ class SubArea(Area) :
         super().__init__(_canvas,_c,_w,_exactHori,_filled)
         _superArea.addSub(_d,_frac)
     def subInitialize(self) :
-
+        raise Exception("didnt plan")
         super().initialize()
         #todo

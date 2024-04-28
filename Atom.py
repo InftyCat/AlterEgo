@@ -57,7 +57,7 @@ class Atom:
             (x1,y1) = self.room
             
             (x2,y2) = self.getCoRoom()
-            print(".",self,(x1,y1),(x2,y2))
+            #print(".",self,(x1,y1),(x2,y2))
             if self.info == Ker :     
                 print("KER",x1,y1,x2,y2)
                 return wld.createker(x1,y1,x2,y2)
@@ -69,12 +69,13 @@ class Atom:
             elif self.info == Full :
                 a = wld.areas[(x1,y1)]
                 full = Area.Area(wld.canvas,a.c,15,a.width,a.height)
+                #print("aha")
                 for s in wld.areas[(x1,y1)].segments : full.stealSegment(s)
                 return full
             elif self.info == Zero:
-                a = wld.areas[(x1,y1)]
-                zero = Area.Area(wld.canvas,"#000000",3,a.width,a.height)
-                for s in a.segments : zero.stealSegment(s)
+                print("this code")
+                zero = Area.Area(wld.canvas,"#000000",3) #,a.width,a.height)
+                for s in wld.areas[(x1,y1)].segments : zero.stealSegment(s)
                 return zero
     def __eq__(self, other):
             if isinstance(other, Atom):
