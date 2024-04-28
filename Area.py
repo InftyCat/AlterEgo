@@ -297,8 +297,7 @@ class Area :
         #print(arcs)
         leftFrac2 = self.leftFrac
         upFrac2 = self.upFrac
-        if (self.segments != [] and False) :
-            print("segments are nonempty before")
+        
         self.create_segments("line",    x+ width - leftFrac2*_min ,y, x+width , y)
         st = "line"
         if ("NO" in arcs) :
@@ -393,6 +392,6 @@ class SubArea(Area) :
         super().__init__(_canvas,_c,_w,_exactHori,_filled)
         _superArea.addSub(_d,_frac)
     def subInitialize(self) :
-        raise Exception("didnt plan")
+        
         super().initialize()
         #todo
