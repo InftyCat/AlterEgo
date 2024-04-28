@@ -62,7 +62,8 @@ def comPnts(p1,p2) :
     #print(p1,p2)
     (x1,y1) = p1
     (x2,y2) = p2
-    return (abs(x1 - x2) < 20 and (abs(y1-y2) < 20))
+    r = 40
+    return (abs(x1 - x2) < r and (abs(y1-y2) < r))
 def inList(self,others,eq) :
         for o in others:
             if (eq (self , o)) : return True

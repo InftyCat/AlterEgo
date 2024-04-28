@@ -20,10 +20,11 @@ from Molecule import *
 
 
 from Room import *
-originX = 200
-originY = 100
 stdWidth = 300
 stdHeight = 300
+originX = 200
+originY = 100
+
 from enum import Enum
 
 def dirToMdir(d) :
@@ -65,8 +66,40 @@ class World :
             return False
         else :            
             return any (map (lambda s2 : self.existsCompMorphs(s2,t), sout))
+    def addArea(self,x,y,width=stdWidth,height=stdHeight,exactHori=True,c=None) :
+        #(x,y) = atom.room
         
- 
+        if (c == None) :
+            c =Bsc.get_random_color()
+            
+        if (not (x,y) in self.areas) :
+            #print(x,y,c)
+            #print("addArea" , x,y)
+            #print(getWidth(x, y))
+            self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),width,height,exactHori) #[(x,y)] = c #[x].append(a)
+    def addSubArea(self,room,subRoom,d,frac,c=None) :
+        if (c == None) :
+            c = Bsc.get_random_color()
+        self.areas[subRoom] =Area.SubArea(self.areas[room],d,frac,self.canvas,c,Bsc.getWidth(*room),True)
+    def addSES(self,room,d,frac,c=None) :
+       if not (room in self.areas.keys()) : 
+           if d == Hori : 
+               wi = 1 * stdWidth # *1.5
+               he = stdHeight
+           else :
+               wi = stdWidth
+               he = 1  * stdHeight#* 1.5
+           self.addArea(*room,width=wi,height=he)
+       subRoom = Atom.Atom(room, d,Im).getCoRoom()  
+       self.addSubArea(room,subRoom,d,frac,c)
+       self.addMorphism(*subRoom,*room,prop=Morphism.Mono,extra = [Coker])
+
+
+       #TODO
+       #quotRoom = Atom.Atom(room,d,Ker).getCoRoom()
+
+        
+        
     def safeMax(self,kwargs) :# returns None if the 
         m = self.maximum(kwargs)
         for p in kwargs :
@@ -96,7 +129,7 @@ class World :
 
                 # one should be able to get to original state back TODO
                 bs.append(b)
-            if (b.isKernel(self))  and a.isBiggerThan(u) and Helper.UseUncertaintyForAssumption in self.helper :
+            if (b.isKernel(self) and a.isKernel(self))  and a.isBiggerThan(u) and Helper.UseUncertaintyForAssumption in self.helper :
                 #print("lol")
                 bu.append(b)
         if (self.assCnt < len(bs + bu)) :
@@ -112,6 +145,18 @@ class World :
             if self.assCnt > 0 :
                 self.assCnt = 0
                 self.applyAss()
+    def exactList(self,room)                : 
+        el = self.areas[room].exactList()
+        dele = []
+        for d in el :           
+            b = False
+            for inf in [Ker, Im] :
+                if not (b or (Atom.Atom(room,d,inf).getCoRoom() in self.areas.keys())) :                    
+                    dele.append(d)                    
+                    b = True
+        for d in dele : 
+            el.remove(d)
+        return el
     def addCokernel(self ,x1, y1 ,x2 , y2) : 
         """(x1,y1) = src
         (x2,y2) = trg"""
@@ -145,14 +190,6 @@ class World :
     def move(self,forward,d) :
         self.mm().move(forward,d)
         self.assCnt = 0
-    def addArea(self,x,y,exactHori=True,c=None) :
-        #(x,y) = atom.room
-
-        if (c == None) :
-            c = Bsc.get_random_color()
-        if (not (x,y) in self.areas) :
-            #print(getWidth(x, y))
-            self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),exactHori) #[(x,y)] = c #[x].append(a)
     
     def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False, extra = []) :
         drawingConstraints = None
@@ -174,6 +211,7 @@ class World :
 
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
         if Coker in extra : 
+            print("adding cokernel")
             self.addCokernel(xs,ys,xt,yt)
         if Ker in extra :
             self.addKernel(xs,ys,xt,yt)
@@ -250,16 +288,20 @@ class World :
             
         while (not (Bsc.inList(segs[tidx].trg() , ay.getPoints() , Bsc.comPnts))) :
             tidx -=1
-            #if (tidx == 1 ) : 
-            #        print("tidx Error!")
-            #        break 
-        #print("test")
+            if (tidx == 1 ) : 
+                    print("tidx Error!")
+                    break 
+        
         segs = segs[sidx:tidx+1] #list(filter(lambda s : Bsc.inList(s.src() , ay.getPoints() , Bsc.comPnts) ,  ))
         xstart = (segs[0].x1,segs[0].y1)
-        xend = (segs[-1].x2,segs[-1].y2)
-        #print("xstart/end",xstart,xend)
-        #self.canvas.create_circle_arc(*xstart,20,start = 0,end = 359,fill="black")
-        #self.canvas.create_circle_arc(*xend,30,start = 0,end = 359,fill="white")
+        xendidx = len(segs)-1
+
+        xend = (segs[xendidx].x2,segs[xendidx].y2)
+        while ((not (Bsc.inList(xend , ay.getPoints() , Bsc.comPnts)))) :
+            xendidx -= 1
+            print("inc")
+            xend = (segs[xendidx].x2,segs[xendidx].y2)
+        #istart = list(filter (lambda  i : Bsc.comPnts(ay.segments[i].src() , xend) ,  range(len(ay.segments))))
         istart = list(filter (lambda  i : Bsc.comPnts(ay.segments[i].src() , xend) ,  range(len(ay.segments))))
         iend = list(filter (lambda i : Bsc.comPnts(ay.segments[i].trg() , xstart) , range(len(ay.segments))))
         if (len(istart) * len(iend) == 0) :
@@ -270,8 +312,13 @@ class World :
             if (len(iend) != 1) :
                 print ("werid end")
             istart = istart[0]
-            iend =iend[0] + 1
-            #print(istart,iend)
+           
+            iend =iend[0]   +1
+            
+            if (dirToMdir(d) == Diag) :#weird bug : 
+                
+                iend -= 1 ## if you know better fix, feel free
+            
             segs2 = getSubList(istart,iend,ay.segments)
             
             img= Area.Area(self.canvas,ay.c,ay.w*2) #1.5)
@@ -287,7 +334,7 @@ class World :
 
         if (x1,y1) == (x2,y2) or b :
            a = self.areas[(x1,y1)]
-           zero = Area.Area(self.canvas,"black", a.w * 0.1 )
+           zero = Area.Area(self.canvas,"black", a.w * 0.1,a.width,a.height )
            for s in a.segments :
                zero.stealSegment(s)
            return zero
@@ -376,11 +423,35 @@ class World :
             w = 6
             #print(coords,st)
             if (coords in self.drawingConstraints.keys()) :
-                self.areas[coords] = self.drawingConstraints[coords].getArea(self)
+                    dC = self.drawingConstraints[coords]
+                
+                    self.areas[coords] = dC.getArea(self)
+                    
+                    #self.areas[coords].initialize()
                 #print("adding area by constraint: " , self.drawingConstraints[coords])
             else :
-                self.areas[coords].initialize(originX + x * (stdWidth / 2 ) -  w / 2 * (x +y),
-                        originY + y * (stdHeight / 2) -  w / 2* (x + y),
-                        stdWidth +  w  * (x +y)  ,stdHeight +  w  * (x +y),st)
+                a = self.areas[coords]
+                if (isinstance(a,Area.SubArea))                 : 
+                    a.subInitialize()
+                else :
+                    insWidth = 0
+                    insHeight = 0
+                    y2 = y
+                    for x2 in range(x) :
+                        while not ((x2,y2) in self.areas.keys()) :
+                            y2 -= 1
+
+                        a = self.areas[(x2,y2)]
+                        insWidth += a.width * (a.rightFrac) 
+                    x2 = x
+                    for y2 in range(y) : 
+                        while not ((x2,y2) in self.areas.keys()) :
+                            x2 -=1
+                        a = self.areas[(x2,y2)] 
+                        insHeight += a.height * (a.downFrac)
+                    
+                    self.areas[coords].initialize(originX + insWidth -  w / 2 * (x +y),
+                            originY + insHeight -  w / 2* (x + y),
+                            a.width +  w  * (x +y)  ,a.height +  w  * (x +y),st)
         self.mm().initState() 
         self.morPropToImp()

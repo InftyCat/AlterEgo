@@ -10,21 +10,37 @@ import BasicFunctions as Bsc
 import tkinter as tkr
 
 import Atom 
+
 class Area : 
-     def __init__ (self,_canvas,_c,_w,_exactHori = True,_filled =False)  :
+     def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, )  :
          self.canvas = _canvas
          self.w = _w
          self.c = _c
+        # print("init:",self.c)
          self.segments = []
          self.exactHori = _exactHori
          self.mp = None
          self.filled = _filled
          self.fillArea = None
+         self.initFracs()
+         self.width = _width
+         self.height = _height
+     def addSub(self, d, frac) :
+         if (d == Atom.Hori) :
+             self.leftFrac = frac
+             self.initRightFrac()
+         else : 
+             self.upFrac = frac
+             self.downFrac = 1 - frac
+     def addQuot(self,d,frac) :
+         return
+         #todo #if (d == Atom.Hori) : 
+             
      def create_segments (self,style, *kwargs,glue=False):
         #print(kwargs,len(kwargs))
         segs = [[kwargs[i], kwargs[i+1],kwargs[i+2],kwargs[i+3]] for i in range(0, len(kwargs)-2, 2)]
         #directs = ["N"]
-        
+      
         for i in range(len(segs)) :
             #print("start",i)
             if (segs[i][0],segs[i][1]) != (segs[i][2],segs[i][3]) :
@@ -40,6 +56,7 @@ class Area :
         s = seg.copy()
         s.c = self.c
         s.w = self.w #*= 1.5
+        #print("stealing a segment from len", len(self.segments) , ":" , s)
         self.segments.append(s)                    
      def generateDirections(self) :
         direct= []
@@ -78,7 +95,7 @@ class Area :
         core(nV , vlab , nVp , direct, glues,"V")
        
         
-       #print(direct)
+        #print(direct)
         for i in range(len(self.segments)):
             self.segments[i].dir = direct[i]
      def getPoints(self) : 
@@ -92,12 +109,13 @@ class Area :
          return p
      def drawPoints(self) : 
          for seg in self.segments :
-             r = 10
+             r = 20
              if (seg == self.segments[0]) :
-                 r = 20
-             self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill="black")
+                 r = 30
+             self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill=self.c)
      def drawSegments (self):
         
+        #print("number of segs to draw", len(self.segments))
         for seg in self.segments :
             seg.draw()
         if self.filled :
@@ -259,42 +277,56 @@ class Area :
          if self.exactHori :
              a.append(Atom.Hori)
          return a
+    #  def getRightFrac(self) :
+    #     if self.exactHori :
+    #         self.rightFrac =  1 - self.leftFrac         
+    #     return self.rightFrac
+     def initRightFrac(self,rf=1/2) : 
+        self.rightFrac = rf
+        if self.exactHori :
+            self.rightFrac =  1 - self.leftFrac     
+     def initFracs(self) :
+        self.leftFrac = 1 / 3
+        self.upFrac = 1 / 3
+
+        self.initRightFrac()
+        self.downFrac = 1 - self.upFrac
      def initialize(self,x,y,width,height,arcs) :
-        roundcoef = 1/3
+      # this function draws the segments starting from leftFrac and upFrac.
         _min= min(width,height)
         #print(arcs)
-        if self.exactHori :
-            roundcoef = 1/2
-            
-        self.create_segments("line",    x+ width - roundcoef*_min ,y, x+width , y)
+        leftFrac2 = self.leftFrac
+        upFrac2 = self.upFrac
+        
+        self.create_segments("line",    x+ width - leftFrac2*_min ,y, x+width , y)
         st = "line"
         if ("NO" in arcs) :
             st = "UL"
-        self.createArc(x + width , y , x + width , y + _min * roundcoef,st)
+        self.createArc(x + width , y , x + width , y + _min * self.upFrac,st)
         
-        self.create_segments("line",x + width , y + _min * roundcoef , x + width , y + height - _min * roundcoef)
+        self.create_segments("line",x + width , y + _min * self.upFrac , x + width , y + height - _min * upFrac2)
         if ("SO" in arcs) :
             st = "DR"
             
         else : 
             st = "line"
-        self.createArc(x + width , y + height - _min * roundcoef , x +width - _min * roundcoef , y+ height,st)
-        self.create_segments("line",x +width - _min * roundcoef , y+ height, x + _min * roundcoef , y+ height,x,y+height)
+        self.createArc(x + width , y + height - _min * upFrac2 , x +width - _min * leftFrac2 , y+ height,st)
+        self.create_segments("line",x +width - _min * leftFrac2 , y+ height, x + _min * self.leftFrac , y+ height,x,y+height)
         if ("SW" in arcs) : 
             st = "DR" 
         else :
             st = "line"
-        self.createArc(x  , y+ height , x , y + height - _min * roundcoef,st)
-        self.create_segments("line",x , y +height - _min * roundcoef, x ,y + _min * roundcoef)
+        self.createArc(x  , y+ height , x , y + height - _min * upFrac2,st)
+        self.create_segments("line",x , y +height - _min * upFrac2, x ,y + _min * self.upFrac)
         if ("NW" in arcs):
             
             st = "UL"
         else:
             st = "line"
         
-        self.createArc( x ,y + _min * roundcoef,x + _min * roundcoef,y,st)
-        self.create_segments("line",x + _min * roundcoef,y,x + width - _min*roundcoef,y)
-        
+        self.createArc( x ,y + _min * self.upFrac,x + _min * self.leftFrac,y,st)
+        self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
+        #self.drawPoints()
                         
 def isSpecialArc(style,x1,y1,x2,y2):
         return style != "line" and x1 == x2
@@ -332,6 +364,8 @@ def _createArea(self,x,y,width,height,c,w,exactHori, *arcs):
 
     
     a= Area(self,_c=c,_w=w)
+    if (a.segments != []) :
+            raise Exception("segments are nonempty before!!!")
     a.initialize(x, y, width, height, *arcs)
             
 
@@ -350,3 +384,14 @@ def _create_circle_arcUL(self, x, y, r, **kwargs):
     return self.create_arc(x, y-r, x+2*r, y+r, start = 90, style="arc", **kwargs)
 
 
+class SubArea(Area) :
+    def __init__(self,_superArea : Area,_d,_frac,_canvas,_c,_w,_exactHori = True,_filled =False) :
+        self.superArea = _superArea
+        self.d = _d
+        self.frac = _frac
+        super().__init__(_canvas,_c,_w,_exactHori,_filled)
+        _superArea.addSub(_d,_frac)
+    def subInitialize(self) :
+        
+        super().initialize()
+        #todo

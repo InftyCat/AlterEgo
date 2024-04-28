@@ -155,8 +155,9 @@ class Particle :
             else :
                 
                 #print("uncarea now infty")
+                #print("also this code")
                 a = self.wld.areas[(x1,y1)]
-                full = Area.Area(self.wld.canvas,"#000000",a.w * 2,_filled=True)
-                for s in a.segments : full.stealSegment(s)
+                full = Area.Area(self.wld.canvas,"#000000",a.w * 2,a.width,a.height,_filled=True)
+                for s in self.wld.areas[(x1,y1)].segments : full.stealSegment(s)
                 return full
         
