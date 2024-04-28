@@ -126,6 +126,7 @@ class Molecule :
         self.uncertainty().initArea()
        # print(self.subobject().area)
         self.drawAtom()
+
         self.uncertainty().area.drawSegments() #Todo
     def update(self,state) :    
       #self.deleteState()

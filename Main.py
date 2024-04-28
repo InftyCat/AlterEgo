@@ -209,20 +209,20 @@ def snakeConstruction() :
     wld = World.World(canvas, so , go , helper)
     #wld.mm().UP.updateAtom
 
-    wld.addMorphism(0, 0,0, 1)
-    wld.addMorphism(0, 0,1,0)
-    wld.addMorphism(1,0, 2, 0,Epi)
+    wld.addMorphism(0, 0,1,0, extra=[Atom.Coker])
+    
+    
 
     #wld.addArea(x, y)
     wld.addMorphism(1, 0,1,1)
-    wld.addMorphism(0,1,1,1,Mono)
-    wld.addMorphism(1,1,2,1)
-
+    #wld.addMorphism(0,1,1,1,Mono)
+    wld.addMorphism(1,1,2,1,extra=[Atom.Ker])
+    wld.addMorphism(0, 0,0, 1, extra=[Atom.Coker])
 
     
     wld.addMorphism(2,0,2,1)
 
-    wld.addMorphism(0,1,0,2,Epi)
+    
     
     
     return wld
@@ -252,15 +252,23 @@ def arrow() :
 
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
-    wld.addMorphism(0, 0,0, 1,[Atom.Coker] )
-    
+    #wld.addMorphism(0, 0,0, 1)# ,[Atom.Ker] )
+    wld.addArea(0,0)
+    wld.addArea(0,1)
     return wld
-wld = cokernelFactorization() # arrow() # epiIntro() #monoIntro() #snakeConstruction()#kernelInc() #nineSurj() # epiIntro() #
+def ses() :
+    so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =  Atom.FullOrZeroAtom((2,0),"Zero") # #Atom.Atom((2,0) , Atom.Verti, Atom.Im)  
+    wld = World.World(canvas, so , go)
+    wld.addSES((1,0),Hori,1/3)
+    return wld
+wld = epiIntro() # arrow() #cokernelFactorization() #  snakeConstruction()# arrow() # kernelInc() #nineSurj() # epiIntro() #
 wld.initialize()
 
 
 wld.drawAreas()
-wld.mm().draw()
+
+#wld.mm().draw()
 
 chars = ['w','a','s','d','c','q',
         'f','x','p','j','m','h']
