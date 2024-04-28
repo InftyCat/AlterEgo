@@ -73,7 +73,7 @@ class Atom:
                 for s in wld.areas[(x1,y1)].segments : full.stealSegment(s)
                 return full
             elif self.info == Zero:
-                print("this code")
+                #print("this code")
                 zero = Area.Area(wld.canvas,"#000000",3) #,a.width,a.height)
                 for s in wld.areas[(x1,y1)].segments : zero.stealSegment(s)
                 return zero
