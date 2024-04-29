@@ -20,8 +20,8 @@ from Molecule import *
 
 
 from Room import *
-stdWidth = 300
-stdHeight = 300
+stdWidth = 400
+stdHeight = 400
 originX = 200
 originY = 100
 
@@ -74,13 +74,14 @@ class World :
             
         if (not (x,y) in self.areas) :
             #print(x,y,c)
-            print("addArea" , x,y)
+            #print("addArea" , x,y)
             #print(getWidth(x, y))
             self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),width,height,exactHori) #[(x,y)] = c #[x].append(a)
     def addSubArea(self,room,subRoom,d,frac,c=None) :
         if (c == None) :
             c = Bsc.get_random_color()
         self.areas[subRoom] =Area.SubArea(self.areas[room],d,frac,self.canvas,c,Bsc.getWidth(*room),True)
+        self.drawingConstraints[(subRoom)] = (Atom.Atom(room , d ,  Ker) )
     def addSES(self,room,d,frac,c=None) :
        if not (room in self.areas.keys()) : 
            if d == Hori : 
@@ -160,7 +161,7 @@ class World :
     def addCokernel(self ,x1, y1 ,x2 , y2) : 
         """(x1,y1) = src
         (x2,y2) = trg"""
-        print(x1,y1,x2,y2)
+        #,y1,x2,y2)
         newpos = (2 * x2 - x1 , 2 * y2 - y1)
         
 
@@ -211,7 +212,7 @@ class World :
 
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
         if Coker in extra : 
-            print("adding cokernel")
+            #print("adding cokernel")
             self.addCokernel(xs,ys,xt,yt)
         if Ker in extra :
             self.addKernel(xs,ys,xt,yt)
@@ -282,17 +283,18 @@ class World :
         while (not (abort or Bsc.inList(segs[sidx].src() , ay.getPoints() , Bsc.comPnts))) :
             sidx +=1
             if (sidx == len(segs)) : 
-                print("sidx Error!")
+                raise Exception("sidx Error!")
                 sidx -= 1
                 abort = True
             
         while (not (Bsc.inList(segs[tidx].trg() , ay.getPoints() , Bsc.comPnts))) :
             tidx -=1
             if (tidx == 1 ) : 
-                    print("tidx Error!")
+                    raise Exception("tidx Error!")
                     break 
         
         segs = segs[sidx:tidx+1] #list(filter(lambda s : Bsc.inList(s.src() , ay.getPoints() , Bsc.comPnts) ,  ))
+        
         xstart = (segs[0].x1,segs[0].y1)
         xendidx = len(segs)-1
 
@@ -305,7 +307,7 @@ class World :
         istart = list(filter (lambda  i : Bsc.comPnts(ay.segments[i].src() , xend) ,  range(len(ay.segments))))
         iend = list(filter (lambda i : Bsc.comPnts(ay.segments[i].trg() , xstart) , range(len(ay.segments))))
         if (len(istart) * len(iend) == 0) :
-            print("create image error" )
+            raise Exception("create image error" )
         else :
             if (len(istart) != 1):
                 print ("weird s",[str(ay.segments[i]) for i in istart])
@@ -425,18 +427,20 @@ class World :
             w = 6
             #print(coords,st)
             if (coords in self.drawingConstraints.keys()) :
-                    dC = self.drawingConstraints[coords]
-                
-                    self.areas[coords] = dC.getArea(self)
+                    a = self.areas[coords]
+                    if (isinstance(a,Area.SubArea))     :
+                    #äprint("subinit")
+                        a.subInitialize(st)
+                    else :
+                        dC = self.drawingConstraints[coords]
                     
+                        self.areas[coords] = dC.getArea(self)
+                        #print(self.areas[coords].getPoints())
+#                    self.areas[coords].drawPoints()
                     #self.areas[coords].initialize()
                 #print("adding area by constraint: " , self.drawingConstraints[coords])
             else :
-                a = self.areas[coords]
-                if (isinstance(a,Area.SubArea))     :
-                    #äprint("subinit")
-                    a.subInitialize(st)
-                else :
+                    a = self.areas[coords]                
                     insWidth = 0
                     insHeight = 0
                     y2 = y
@@ -456,5 +460,6 @@ class World :
                     self.areas[coords].initialize(originX + insWidth -  w / 2 * (x +y),
                             originY + insHeight -  w / 2* (x + y),
                             a.width +  w  * (x +y)  ,a.height +  w  * (x +y),st)
+                    self.areas[coords].drawPoints()
         self.mm().initState() 
         self.morPropToImp()

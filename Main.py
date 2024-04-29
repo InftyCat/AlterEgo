@@ -18,7 +18,9 @@ import Atom
 import BasicFunctions as Bsc
 from BasicFunctions import Helper
 from PolygoneWithAlpha import create_alphaPoly
-
+"""
+TODO : manchmal werden UNC nicht angezeigt für subareas. A -> B -> A , + f
+"""
 #w =6
 tk = tkr.Tk()
 frame = tkr.Frame(tk)
@@ -246,15 +248,6 @@ def cokernelFactorization() :
     wld.addMorphism(0,1,1,1,extra = [Atom.Coker])
     
     return wld
-def arrow() :
-    so =  Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,0),"Full") #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
-    go =  Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
-
-    helper = [Helper.UseUncertaintyForAssumption]
-    wld = World.World(canvas, so , go , helper)
-    wld.addMorphism(0, 0,0, 1 ,extra = [Atom.Coker] )
-    
-    return wld
 def obj() : 
     so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
     go =  Atom.FullOrZeroAtom((1,0),"Zero") # #Atom.Atom((2,0) , Atom.Verti, Atom.Im)  
@@ -262,16 +255,26 @@ def obj() :
     wld.addArea(0,0)
     wld.addArea(1,0)
     return wld
+def arrow() :
+    so =  Atom.FullOrZeroAtom((0,-1),"Full") #Atom.Atom((0,-1),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =  Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
+
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
+    wld.addMorphism(0, 0,0, 1 ,extra = [Atom.Ker] )
+    
+    return wld
+
 def ses() :
-    so =  Atom.FullOrZeroAtom((0,0),"Zero") # #Atom.Atom((2,0) , Atom.Verti, Atom.Im)  
-    go =  Atom.FullOrZeroAtom((-1,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    so =  Atom.FullOrZeroAtom((-1,0),"Full") # Atom.Atom((1,0) , Atom.Hori, Atom.Im)  #
+    go =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
     wld = World.World(canvas, so , go)
     #wld.addArea(0,0)
     #wld.addSubArea((0,0),(-1,0),Hori,1/3)
-    #wld.addMorphism(-1,0,0,0,prop=Mono)
+   # wld.addMorphism(-1,0,0,0,prop=Mono)
     wld.addSES((0,0),Hori,1/3)
     return wld
-wld = ses() # ses() # cokernelFactorization() #  epiIntro() #obj() # snakeConstruction()# arrow() # kernelInc() #nineSurj() # 
+wld = ses() #  ses() # cokernelFactorization() #  epiIntro() #obj() # snakeConstruction()# kernelInc() #nineSurj() # 
 wld.initialize()
 
 

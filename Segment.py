@@ -18,7 +18,7 @@ class Segment :
     def invert(self) :
         return Segment(self.canvas,self.x2,self.y2,self.x1,self.y1 , self.style,self.w,self.c)
     def __str__ (self) :
-        return str(self.x1) + " " + str(self.y1) + "->" + str(self.x2) + " " + str(self.y2)
+        return str(round(self.x1)) + " " + str(round(self.y1)) + "->" + str(round(self.x2))+ " " + str(round(self.y2))
     def __init__ (self,_canvas,_x1,_y1,_x2,_y2,_style,_w,_c,_glue = False):
         self.x1 = _x1
         self.x2 = _x2

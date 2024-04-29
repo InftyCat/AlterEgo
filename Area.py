@@ -54,6 +54,8 @@ class Area :
                             print("seg append didnt fit")
                     self.segments.append(Segment.Segment(self.canvas,*segs[i],_style=style,_w = self.w,_c = self.c,_glue=glue)) #,_dir = direct[i]) )
      def stealSegment (self,seg) :
+        if (isinstance(self,SubArea)) : 
+            raise ("well")
         #print("stealing",seg)
         s = seg.copy()
         s.c = self.c
@@ -111,10 +113,15 @@ class Area :
          return p
      def drawPoints(self) : 
          for seg in self.segments :
-             r = 20
+             r = 25
              if (seg == self.segments[0]) :
                  r = 30
              self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill=self.c)
+     def showSegments(self) :
+        st = ""
+        for s in self.segments :
+            st += str(s) + " | "
+        print(st)
      def drawSegments (self):
         
         #print("number of segs to draw", len(self.segments))
@@ -191,13 +198,20 @@ class Area :
         
          comp = Area(self.canvas,c,w )
          i = 0
+         #print("sub:")
+         #sub.showSegments()
+         #print("____________\n self:")
+         #self.showSegments()
+         #for s in sub.segments : print(s) 
+         #for s in self.segments : print(s) 
          idx = sub.getSegIdxByTrg(self.segments[i].trg())
-        
+         #
+         #print(idx)
          
          while (idx != -1) :       # finding first self-segment not contained in sub                  
              i += 1
              idx = sub.getSegIdxByTrg(self.segments[i].trg())
-          
+         #print("erstes self-segment not contained in sub hat idx" , i)
          comp.stealSegment(self.segments[i])
          while (idx == -1) :
              
@@ -222,12 +236,12 @@ class Area :
             j = self.getSegIdxBySrc(sub.segments[idx].src())
             idx -= 1
             
-         """   
+         #comp.stealSegment(sub.segments[idx].invert())
             
-         if nunc :
-             for i in range(j,len(self.segments)) :             
-                comp.stealSegment(self.segments[i])
-                """
+         
+        # for i in range(j,len(self.segments)) :             
+        #        comp.stealSegment(self.segments[i])
+                
          return comp
         
      def comp (self, quot,unc=False) :
@@ -296,6 +310,10 @@ class Area :
      def initialize(self,x,y,width,height,arcs) : # width height werden nochmal übergeben, wegen width changes.
       # this function draws the segments starting from leftFrac and upFrac.
         _min= min(width,height)
+        if (self.leftFrac == 0) :
+            _min = height
+        if (self.upFrac == 0) :
+            _min = width
         #print(arcs)
         self.x = x
         self.y = y
@@ -399,9 +417,15 @@ class SubArea(Area) :
         if (self.d == Atom.Hori) : 
             wi = self.superArea.width * self.frac
             hi = self.superArea.height
+            self.leftFrac = 0
+            self.initRightFrac()
         else : 
             wi = self.superArea.width
             hi = self.superArea.height * self.frac 
-        print(wi,hi)
+            self.upFrac = 0
+            self.downFrac = 0 #todo?
+        #print(wi,hi)
         super().initialize(self.superArea.x,self.superArea.y,wi,hi,st)
+        self.superArea.segments = [self.superArea.segments[-1]] + self.superArea.segments[:-1]
+        #self.showSegments()
         #todo
