@@ -137,12 +137,12 @@ class Particle :
     def getUncCoRoom(self) : 
         return self.atom.getKernelRoom(self.genus == Genus.Unc)
     
-    def getArea(self) : 
+    def getArea(self) : #,forRandomPurpose=False) : 
         
         atom = self.atom
-        if self.genus == Genus.Sub :
+        if self.genus == Genus.Sub : #or forRandomPurpose :
         #atom = self.subobject()
-            return atom.getArea(self.wld)
+            return atom.getArea(self.wld) # ,unc=False)
         elif  self.genus == Genus.Unc :
                    
         #atom = self.uncertainty()

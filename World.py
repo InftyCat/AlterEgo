@@ -359,7 +359,8 @@ class World :
         #self.wld = _wld
         _goalState = _eliminator.targetState
         #self.eliminator = _eliminator
-        print("creating can Molecule from state" , _state)
+        
+        #print("creating can Molecule from state" , _state)
         SP = lambda mol : Particle.Particle(mol,_state.subobject,Genus.Sub,_goalState)
        
         focus = Genus.Sub
@@ -460,6 +461,6 @@ class World :
                     self.areas[coords].initialize(originX + insWidth -  w / 2 * (x +y),
                             originY + insHeight -  w / 2* (x + y),
                             a.width +  w  * (x +y)  ,a.height +  w  * (x +y),st)
-                    self.areas[coords].drawPoints()
+                    #self.areas[coords].drawPoints()
         self.mm().initState() 
         self.morPropToImp()

@@ -8,8 +8,12 @@ Created on Fri Mar 22 12:19:32 2024
 import Segment
 import BasicFunctions as Bsc
 import tkinter as tkr
-
+import random
 import Atom 
+import numpy as np
+import sys
+sys.path.append("./anaconda3/lib/python3.9/site-packages")
+from shapely.geometry import Point, Polygon
 
 class Area : 
      def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, )  :
@@ -252,7 +256,7 @@ class Area :
          if (unc) :
             w = self.w / 2
             c = "black"
-         #unc = False
+         #unc = False 
          comp = Area(self.canvas,c,w )
          i = 0
          idx = quot.getSegIdxByTrg(self.segments[i].src())
@@ -300,10 +304,21 @@ class Area :
      def initRightFrac(self,rf=1/2) : 
         self.rightFrac = rf
         if self.exactHori :
-            self.rightFrac =  1 - self.leftFrac     
+            self.rightFrac =  1 - self.leftFrac  
+     def random_Point_in_Polygon(self):
+        polygon = Polygon(self.getPoints())
+        minx, miny, maxx, maxy = polygon.bounds
+        cnt = 0
+        while cnt < 10000:
+            pnt = Point(np.random.uniform(minx, maxx), np.random.uniform(miny, maxy))
+            if polygon.contains(pnt):
+                return pnt
+
+            cnt +=1         
+        raise Exception("random point was not construtible")
      def initFracs(self) :
-        self.leftFrac = 1 / 3
-        self.upFrac = 1 / 3
+        self.leftFrac = 1 / 2
+        self.upFrac = 1 / 2
 
         self.initRightFrac()
         self.downFrac = 1 - self.upFrac
@@ -349,7 +364,8 @@ class Area :
         self.createArc( x ,y + _min * self.upFrac,x + _min * self.leftFrac,y,st)
         self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
         #self.drawPoints()
-                        
+
+
 def isSpecialArc(style,x1,y1,x2,y2):
         return style != "line" and x1 == x2
 def _createArc(self,x1,y1,x2,y2,style) :     

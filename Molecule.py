@@ -89,7 +89,7 @@ class Molecule :
             return s
         else :
             return self.SP.printHistory() + " | " + self.UP.printHistory()
-
+    
     def fin(self) :
         #check wether other molecules have bigger goals and equal eliminators
         newM = self.checkFin()
