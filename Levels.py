@@ -6,7 +6,7 @@ from BasicFunctions import Helper
 import World
 def viererMono(canvas) :
 
-    so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker)  #Atom.FullOrZeroAtom((2,0),"Full")#
+    so = Atom.Atom((2,0),Atom.Verti,Atom.Ker)  # Atom.Atom((1,1),Atom.Verti,Atom.Im)  #Atom.FullOrZeroAtom((1,0),"Full")#  
     go =Atom.FullOrZeroAtom((2,0),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
     print("wts: vertical map is injective!")
@@ -126,7 +126,7 @@ def snakeConstruction(canvas) :
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
     #wld.mm().UP.updateAtom
-
+    #wld.addSES()
     wld.addMorphism(0, 0,1,0, extra=[Atom.Coker])
     
     

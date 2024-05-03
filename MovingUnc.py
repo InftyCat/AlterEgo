@@ -26,7 +26,7 @@ class MovingUnc :
     def removePart(self,unc) :
         if (unc in self.uncpnt.keys()) : 
                     self.canvas.delete(self.uncpnt[unc])
-        self.uncpnt.pop(unc)
+                    self.uncpnt.pop(unc)
 
     def repeat_every_second(self) : 
         

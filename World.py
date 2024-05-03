@@ -297,7 +297,7 @@ class World :
             
         while (not (Bsc.inList(segs[tidx].trg() , ay.getPoints() , Bsc.comPnts))) :
             tidx -=1
-            if (tidx == 1 ) : 
+            if (tidx == 0 ) : 
                     raise Exception("tidx Error!")
                     break 
         
