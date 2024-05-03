@@ -4,14 +4,24 @@ import State
 import Atom
 from BasicFunctions import Helper
 import World
+def getSOGOFromMor(dir,src,trg,prop) :
+    #wld.getMdir(*src,*trg)
+    print("wts: " , dir, "map " , src , "->", trg, "is" , prop)
+    if prop == Mono :
+        so = Atom.Atom(src,dir,Atom.Ker)
+        go = Atom.FullOrZeroAtom(src,Atom.Zero)
+    elif prop == Epi :
+        so = Atom.FullOrZeroAtom(trg,Atom.Full)
+        go = Atom.Atom(trg,dir,Atom.Im)
+    return (so,go)
 def viererMono(canvas) :
 
     so = Atom.Atom((2,0),Atom.Verti,Atom.Ker)  # Atom.Atom((1,1),Atom.Verti,Atom.Im)  #Atom.FullOrZeroAtom((1,0),"Full")#  
     go =Atom.FullOrZeroAtom((2,0),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
-    print("wts: vertical map is injective!")
+    
     helper = [Helper.UseUncertaintyForAssumption]
-    wld = World.World(canvas, so , go , helper)
+    wld = World.World(canvas, *getSOGOFromMor("Verti",(2,0),(2,1),Mono), helper)
 
     wld.addMorphism(0, 0,0, 1 ,Epi)
     wld.addMorphism(0, 0,1,0)
@@ -32,14 +42,10 @@ def viererMono(canvas) :
     return wld
 
 def viererEpi(canvas) :
-
-    so =  Atom.FullOrZeroAtom((1,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
-    go =   Atom.Atom((1,1) , Atom.Verti, Atom.Im) 
-    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
-    
+ 
     
     helper = [Helper.UseUncertaintyForAssumption]
-    wld = World.World(canvas, so , go , helper)
+    wld = World.World(canvas, *getSOGOFromMor("Verti",(1,0),(0,1),Epi), helper)
     #wld.mm().UP.updateAtom
 
     wld.addMorphism(0, 0,0, 1 ,Epi)
@@ -59,10 +65,8 @@ def viererEpi(canvas) :
     wld.addMorphism(3,0,3,1,Mono)
     return wld
 
-def epiIntro(canvas) :
-    so =Atom.FullOrZeroAtom((1,0),"Full")
-    go = Atom.Atom((1,0),Atom.Hori,Atom.Im)
-    wld = World.World(canvas, so , go )
+def epiIntro(canvas) :    
+    wld = World.World(canvas, *getSOGOFromMor("Hori",(0,0),(1,0),Epi))
     wld.addMorphism(0,0,1,0)
     wld.addMorphism(1,0,1,1)
     
@@ -84,7 +88,7 @@ def kernelInc(canvas) :
 def monoIntro(canvas) :
     so =  Atom.Atom((1,0),Atom.Verti,Atom.Ker)
     go =Atom.FullOrZeroAtom((1,0),"Zero")
-    wld = World.World(canvas, so , go )
+    wld = World.World(canvas, *getSOGOFromMor("Verti",(1,0),(1,1),Mono) )
     wld.addMorphism(0,0,1,0)
     wld.addMorphism(1,0,1,1)
     
@@ -110,11 +114,11 @@ def add3x3ToWld(wld,avoidRow=0) :
                         wld.addMorphism(x,y,x+xi,y+yi,m)
     
 def nineSurj(canvas) :
-    so = Atom.FullOrZeroAtom((2,0),"Full") 
-    go = Atom.Atom((2,0),Atom.Hori,Atom.Im)
+    #so = Atom.FullOrZeroAtom((2,0),"Full") 
+    #go = Atom.Atom((2,0),) #Atom.Hori,Atom.Im)
     """so = Atom.Atom((2,0),Atom.Verti,Atom.Ker)
     go = Atom.FullOrZeroAtom((2,0),"Zero") """
-    wld = World.World(canvas,so,go)
+    wld = World.World(canvas,*getSOGOFromMor(Hori,(1,0),(2,0),Epi))
     add3x3ToWld(wld)
     return wld
 def snakeConstruction(canvas) :

@@ -44,6 +44,7 @@ def getSubList(istart,iend,ay) :
 stdHelper = [Helper.EliminateToOtherMolecules , Helper.UseUncertaintyForAssumption]   
 class World :
     def __init__ (self,_canvas,_subobject,goalAtom, helper = []) :
+        
         self.canvas = _canvas
         self.areas = {} #{} #[[]]
         self.morphs = {}
@@ -207,7 +208,7 @@ class World :
             self.drawingConstraints[(xs,ys)] = (Atom.Atom((xt,yt) , d ,  Ker) )
         
         if (prop != "") : 
-            print("Adding" , prop , (xs,ys) , (xt,yt))
+            print(prop , (xs,ys) , (xt,yt))
         self.addArea(xs,ys)
         if (drawProp) : 
             if prop == Morphism.Epi :
