@@ -16,7 +16,7 @@ sys.path.append("./anaconda3/lib/python3.9/site-packages")
 from shapely.geometry import Point, Polygon
 
 class Area : 
-     def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, )  :
+     def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, ordinary = True)  :
          self.canvas = _canvas
          self.w = _w
          self.c = _c
@@ -31,6 +31,7 @@ class Area :
          self.height = _height
          self.x = None
          self.y = None
+         self.ordinary = ordinary
      def addSub(self, d, frac) :
          if (d == Atom.Hori) :
              self.leftFrac = frac
@@ -53,6 +54,7 @@ class Area :
                # if glue : 
                    # self.segments[-1].enlarge(segs[i][2] , segs[i][3]) 
                # else :
+                    
                     if (len(self.segments) > 0) : 
                         if not Bsc.comPnts(self.segments[-1].trg() , (segs[i][0] , segs[i][1])) :
                             print("seg append didnt fit")
@@ -132,8 +134,8 @@ class Area :
         for seg in self.segments :
             seg.draw()
         if self.filled :
-            
-            self.fillArea = self.canvas.create_polygonWithAlpha(*(self.getPointsAsNumberList()),fill=self.c , alpha=0.5) #='#0070c080')"#ff000055")# #self.c,
+            if (self.ordinary)  :
+                self.fillArea = self.canvas.create_polygonWithAlpha(*(self.getPointsAsNumberList()),fill=self.c , alpha=0.5) #='#0070c080')"#ff000055")# #self.c,
      def segmentFromDirection(self , d) :
         self.generateDirections()
         l = list (filter(lambda s : Bsc.so(s.dir) == Bsc.so(d) , self.segments))
@@ -141,9 +143,9 @@ class Area :
             return l[0]
         else  :
             print("segment with direction " , d , " not found")
-        
-     def drawMiddlepoint(self) :
+     def getMiddlePoint(self , offSet = 0) :
          pts = self.getPoints()
+         
          (x1,y1) = pts[0]
          (x2,y2) = pts[0]  #segmentFromDirection("SW").trg()
          for p in pts :
@@ -154,9 +156,14 @@ class Area :
                  (x2 , y2) = (x,y)
          
          
-         x = (x1 + x2) /2
-         y = (y1 + y2) /2
-         self.mp = self.canvas.create_circle_arc(x,y,20,start = 0,end = 359,fill=self.c)
+         x = (x1 + x2) /2 + offSet
+         y = (y1 + y2) /2 + offSet
+         return (x,y)
+     def drawAndReturnZeroArea(self) :
+         return self.canvas.create_circle_arc(*self.getMiddlePoint(30),20,start = 0,end = 359)
+     def drawMiddlepoint(self) :
+         if self.ordinary :
+            self.mp = self.canvas.create_circle_arc(*self.getMiddlePoint(),20,start = 0,end = 359,fill=self.c)
          #self.mp = self.canvas.create_circle_arc(x2,y2,20,start = 0,end = 359,fill="blue")
      def eraseSegments(self) :
          
@@ -167,6 +174,9 @@ class Area :
              self.canvas.delete(self.mp)
          if (self.filled) :
              self.canvas.delete(self.fillArea)
+         if (not self.ordinary) :
+             self.canvas.delete(self.area)
+
          self.segments = []
          self.canvas.update()
   

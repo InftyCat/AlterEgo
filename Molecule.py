@@ -97,6 +97,7 @@ class Molecule :
             #print("Not finishable!")
         if newM != None :  #else :
             self.wld.removeFromList(self) 
+            self.wld.uncPart.removePart(self.uncertainty())
             self.erase()
             self.wld.canvas.update()
             for m in newM :

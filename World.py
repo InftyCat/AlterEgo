@@ -17,7 +17,7 @@ from State import *
 from Atom import Ker , Im ,  Full , Hori , Verti , Diag
 import Atom
 from Molecule import *
-
+from MovingUnc import MovingUnc
 
 from Room import *
 stdWidth = 400
@@ -58,6 +58,9 @@ class World :
         self.drawingConstraints = {}
         #self.focus = 0
         self.helper = stdHelper + helper
+        
+        
+
     def existsCompMorphs(self,s,t)  -> bool :
         sout = self.out(*s)
         if (s == t) : 
@@ -107,6 +110,9 @@ class World :
             if not self.existsCompMorphs(p , m) :
                 return None
         return m
+    def setUncPart(self,uncPart) : 
+        self.uncPart = uncPart
+        self.uncPart.repeat_every_second()
     def maximum (self,kwargs) : 
         xs = max ([x for (x,y) in kwargs]) #kwargs[::2]
         ys =max ([y for (x,y) in kwargs]) #kwargs[1::2]
@@ -200,7 +206,8 @@ class World :
             
             self.drawingConstraints[(xs,ys)] = (Atom.Atom((xt,yt) , d ,  Ker) )
         
-        
+        if (prop != "") : 
+            print("Adding" , prop , (xs,ys) , (xt,yt))
         self.addArea(xs,ys)
         if (drawProp) : 
             if prop == Morphism.Epi :
@@ -245,6 +252,7 @@ class World :
         else :
             return ""    
     def addAss(self, assAtom, impAtom) :
+        print("Assumption: " , assAtom , " inside " , impAtom.showDirInf() )
         self.implications.append((assAtom, impAtom))
 
     def getDir(self,x1,y1,x2,y2) :
@@ -380,6 +388,7 @@ class World :
             self.areas[coords].drawSegments()
     def genMor(self,s,t,p) :
         #print("generate" ,s , "-",  p , "->"  , t )
+
         return Morphism.Morphism(*s,*t,p,self.getMdir(*s , *t))
     def initialize(self) : 
         dr = []

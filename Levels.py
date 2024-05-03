@@ -9,7 +9,7 @@ def viererMono(canvas) :
     so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker)  #Atom.FullOrZeroAtom((2,0),"Full")#
     go =Atom.FullOrZeroAtom((2,0),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
-    
+    print("wts: vertical map is injective!")
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
 
@@ -67,8 +67,8 @@ def epiIntro(canvas) :
     wld.addMorphism(1,0,1,1)
     
     wld.addMorphism(0,0,1,1)
-    wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
-    wld.implications.append((Atom.Atom((1,1),Atom.Verti,Atom.Im) , Atom.Atom((1,1),Atom.Diag,Atom.Im)))
+    wld.addAss(Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im))
+    wld.addAss(Atom.Atom((1,1),Atom.Verti,Atom.Im) , Atom.Atom((1,1),Atom.Diag,Atom.Im))
     return wld
 def kernelInc(canvas) :
     so =  Atom.Atom((0,0),Atom.Diag,Atom.Ker)
@@ -89,8 +89,8 @@ def monoIntro(canvas) :
     wld.addMorphism(1,0,1,1)
     
     wld.addMorphism(0,0,1,1)
-    wld.implications.append((Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im)))
-    wld.implications.append((Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker)))
+    wld.addAss(Atom.Atom((1,0),Atom.Verti,Atom.Ker) , Atom.Atom((1,0),Atom.Hori,Atom.Im))
+    wld.addAss(Atom.Atom((0,0),Atom.Diag,Atom.Ker) , Atom.Atom((0,0),Atom.Hori,Atom.Ker))
     return wld
 def add3x3ToWld(wld,avoidRow=0) :
     for x in range(0,3):
@@ -172,12 +172,13 @@ def obj(canvas) :
     wld.addArea(1,0)
     return wld
 def arrow(canvas) :
-    so =  Atom.FullOrZeroAtom((0,-1),"Full") #Atom.Atom((0,-1),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,-1),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
     go =  Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
 
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
-    wld.addMorphism(0, 0,0, 1 ,extra = [Atom.Ker] )
+    wld.addMorphism(0, 0,0, 1 ) #,extra = [Atom.Ker] 
+     
     
     return wld
 

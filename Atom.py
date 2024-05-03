@@ -76,8 +76,9 @@ class Atom:
                 return full
             elif self.info == Zero:
                 #print("this code")
-                zero = Area.Area(wld.canvas,"#000000",3) #,a.width,a.height)
-                for s in wld.areas[(x1,y1)].segments : zero.stealSegment(s)
+                zero = Area.Area(wld.canvas,"#000000",3,ordinary=False) #,a.width,a.height)
+                zero.area = wld.areas[(x1,y1)].drawAndReturnZeroArea()
+                #for s in wld.areas[(x1,y1)].segments : zero.stealSegment(s)
                 return zero
     def __eq__(self, other):
             if isinstance(other, Atom):

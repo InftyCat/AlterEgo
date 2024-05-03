@@ -16,7 +16,7 @@ import Atom
 from Atom import Hori , Verti, Diag
 
 import BasicFunctions as Bsc
-
+from MovingUnc import MovingUnc
 from PolygoneWithAlpha import create_alphaPoly
 import threading
 import time
@@ -53,8 +53,12 @@ def createPolygone(self, *args, **kwargs) :
     #print("creating polygone")
     return create_alphaPoly(self,images,*args,**kwargs)
 tkr.Canvas.create_polygonWithAlpha = createPolygone
+#################################################################################################
 
-wld = Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  
+wld = Levels.monoIntro(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  
+uncPart = MovingUnc(tk,canvas,wld)
+wld.setUncPart(uncPart)
+#################################################################################################
 wld.initialize()
 
 
@@ -88,26 +92,7 @@ tk.bind("<Key>", key_pressed)
 
 #but2.grid(row=1,column=0)
 #but.pack()
-canvas.uncpnt = None
-def uncAction() :
-    for m in wld.molecules :
-        unc = m.uncertainty()
-        if (canvas.uncpnt != None) : 
-                canvas.delete(canvas.uncpnt)
-        if (unc.atom.info != Atom.Zero) :
-        # print("uncAction", unc)
-            p = unc.atom.getArea(wld).random_Point_in_Polygon()
 
-            (x,y) = (p.x,p.y)
-            
-            canvas.uncpnt =canvas.create_circle_arc(x,y,10,start = 0,end = 359,fill=wld.mm().subobject().area.c)
-            
-    #print(wld.mm().room())
-
-def repeat_every_second() : 
-    uncAction()
-    if (not wld.gameEnd()) : 
-        tk.after(100,repeat_every_second)
     
 """
 def uncertaintyThread() :
@@ -115,6 +100,5 @@ def uncertaintyThread() :
 """    
 #t = threading.Thread(target=uncertaintyThread)
 #t.start()
-repeat_every_second()
 
 tkr.mainloop()
