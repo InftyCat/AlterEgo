@@ -39,7 +39,11 @@ class Area :
              frac = 1 - frac
          if (d == Atom.Hori) :
              self.leftFrac = frac
+             self.upFrac = 1/2
+             self.downFrac = 1/2
+             print("up,down=1/2")
              self.initRightFrac()
+             #print("left,right",self.leftFrac,self.rightFrac)
          else : 
              raise ("add verti sub")
              self.upFrac = frac
@@ -124,9 +128,9 @@ class Area :
          return p
      def drawPoints(self) : 
          for seg in self.segments :
-             r = 30
+             r = 30 
              if (seg == self.segments[0]) :
-                 r = 50
+                 r = 30 #50
              self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill=self.c)
      def showSegments(self) :
         st = ""
@@ -319,10 +323,12 @@ class Area :
     #     if self.exactHori :
     #         self.rightFrac =  1 - self.leftFrac         
     #     return self.rightFrac
+     
      def initRightFrac(self,rf=1/2) : 
         self.rightFrac = rf
-        if self.exactHori :
+        if self.exactHori : 
             self.rightFrac =  1 - self.leftFrac  
+        #print("rightFrac is now " , self.rightFrac)
      def random_Point_in_Polygon(self):
         polygon = Polygon(self.getPoints())
         minx, miny, maxx, maxy = polygon.bounds
@@ -346,6 +352,8 @@ class Area :
        
        # print("start init")
         _min= min(width,height)
+        _minWi = width
+        _minHe = height
         #print(_min == height)
         if (self.leftFrac == 0) :
             _min = height
@@ -357,27 +365,27 @@ class Area :
         leftFrac2 = self.leftFrac
         upFrac2 = self.upFrac
         
-        self.create_segments("line",    x+ width - leftFrac2*_min ,y, x+width , y)
+        self.create_segments("line",    x+ width - leftFrac2*_minWi ,y, x+width , y)
         st = "line"
         if ("NO" in arcs) :
             st = "UL"
-        self.createArc(x + width , y , x + width , y + _min * self.upFrac,st)
+        self.createArc(x + width , y , x + width , y + _minHe * self.upFrac,st)
         
-        self.create_segments("line",x + width , y + _min * self.upFrac , x + width , y + height - _min * upFrac2)
+        self.create_segments("line",x + width , y + _minHe * self.upFrac , x + width , y + height - _minHe * upFrac2)
         if ("SO" in arcs) :
             st = "DR"
             
         else : 
             st = "line"
-        self.createArc(x + width , y + height - _min * upFrac2 , x +width - _min * leftFrac2 , y+ height,st)
-        self.create_segments("line",x +width - _min * leftFrac2 , y+ height, x + _min * self.leftFrac , y+ height,x,y+height)
+        self.createArc(x + width , y + height - _minHe * upFrac2 , x +width - _minWi * leftFrac2 , y+ height,st)
+        self.create_segments("line",x +width - _minWi * leftFrac2 , y+ height, x + _minWi * self.leftFrac , y+ height,x,y+height)
         #In the previous line there is an issuefor subobjects because _min is not height, so 2 interior nodes on the vertical axes are produced.
         if ("SW" in arcs) : 
             st = "DR" 
         else :
             st = "line"
-        self.createArc(x  , y+ height , x , y + height - _min * upFrac2,st)
-        self.create_segments("line",x , y +height - _min * upFrac2, x ,y + _min * self.upFrac)
+        self.createArc(x  , y+ height , x , y + height - _minHe * upFrac2,st)
+        self.create_segments("line",x , y +height - _minHe * upFrac2, x ,y + _minHe * self.upFrac)
         if ("NW" in arcs):
             
             st = "UL"
@@ -388,8 +396,8 @@ class Area :
         
         #print("upf",self.upFrac)
         if (self.leftFrac <= 1/2 ) : #new 
-            self.createArc( x ,y + _min * self.upFrac,x + _min * self.leftFrac,y,st)
-            self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
+            self.createArc( x ,y + _minHe * self.upFrac,x + _minWi * self.leftFrac,y,st)
+            self.create_segments("line",x + _minWi * self.leftFrac,y,x + width - _minWi*leftFrac2,y)
         else :
             
             #print(x ,y + _min * self.upFrac,x + _min * self.leftFrac,y)
@@ -397,7 +405,7 @@ class Area :
             #self.create_segments("line", x ,y + _min * self.upFrac,x,y)
             #self.create_segments("line",x,y,x + _min * self.leftFrac,y)
             #self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
-            self.createArc( x ,y + _min * self.upFrac,x + width - _min*leftFrac2,y,st)
+            self.createArc( x ,y + _minHe * self.upFrac,x + width - _minWi*leftFrac2,y,st)
             #self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
             
         if self.drawPnts : self.drawPoints()

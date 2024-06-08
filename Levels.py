@@ -115,30 +115,33 @@ def add3x3ToWld(wld,avoidRow=0) :
     
 def nineSurj(canvas) :
     #so = Atom.FullOrZeroAtom((2,0),"Full") 
-    #go = Atom.Atom((2,0),) #Atom.Hori,Atom.Im)
+    #go = Ato
+    # m.Atom((2,0),) #Atom.Hori,Atom.Im)
     """so = Atom.Atom((2,0),Atom.Verti,Atom.Ker)
     go = Atom.FullOrZeroAtom((2,0),"Zero") """
     wld = World.World(canvas,*getSOGOFromMor(Hori,(1,0),(2,0),Epi))
     add3x3ToWld(wld)
     return wld
 def snakeConstruction(canvas) :
-    """so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker)
-    go =   Atom.FullOrZeroAtom((0,2),"Full") 
-    """
-    so =   Atom.Atom((1,0) , Atom.Verti, Atom.Ker)
-    go =   Atom.FullOrZeroAtom((1,0),"Full") 
-    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) #
+
+    so =   Atom.Atom((1,0) , Atom.Verti, Atom.Ker)  
+    #so =    Atom.FullOrZeroAtom((0,0),"Zero")
+    go =   Atom.FullOrZeroAtom((0,2),"Full")  #Atom.FullOrZeroAtom((3,1),Atom.Zero) #
+    #+ 
     #  Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
     
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
     #wld.mm().UP.updateAtom
+
     wld.addSES((0,0),Hori,1/3)
     wld.addSES((0,1),Hori,2/3)
     
     wld.addMorphism(0, 0,0, 1) #, extra=[Atom.Coker])
     wld.addMorphism(1, 0,1,1)
+    wld.addMorphism(-1, 0,-1,1)
+   
     #wld.addMorphism(-1,0,-1,1,extra=[Atom.Coker])
     
 

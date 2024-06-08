@@ -20,8 +20,8 @@ class MovingUnc :
                 if (not unc.frozen) : 
                     if (unc in self.uncpnt.keys()) : 
                             self.canvas.delete(self.uncpnt[unc])
-                    if (unc.atom.info != Atom.Zero) :
-                    # print("uncAction", unc)
+                    if (not self.wld.isZero(unc.atom)) :
+                        #print("uncAction", unc)
                         p = unc.atom.getArea(self.wld).random_Point_in_Polygon()
 
                         (x,y) = (p.x,p.y)

@@ -58,11 +58,15 @@ class Molecule :
     def move(self,forward,d) : #todo
         self.jumpable = False
         self.focus = Genus.Sub
+        #self.wld.refineMM(forward) TODO
+        print("rightbefore has moved" , self.subobject())
         hasMoved = self.SP.move(forward,d)
+        
         if hasMoved :
         # think of erasing subobjects if uncertainty is full
             self.updateUncFromSubObj()
             self.wld.uncPart.removePart(self.subobject())
+            #self.wld.refineMM(True) TODO
             self.draw()
     def room(self) :
         return self.SP.atom.room

@@ -36,8 +36,7 @@ class Atom:
          if self.mdir == "" :
               s = ""
          return s + self.info
-    """def isZero(self) : 
-         if (self.info == Zero or (self.info == Ker )"""
+
     def isKernel(self , wld,d=None) :
         if d== None :
              return self.isKernel(wld , Hori) or self.isKernel(wld,Verti)

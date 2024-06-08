@@ -55,7 +55,7 @@ def createPolygone(self, *args, **kwargs) :
 tkr.Canvas.create_polygonWithAlpha = createPolygone
 #################################################################################################
 
-wld = Levels.cokernelFactorization(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
+wld = Levels.snakeConstruction(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
 #################################################################################################
 uncPart = MovingUnc(tk,canvas,wld)
 wld.setUncPart(uncPart)
@@ -65,7 +65,12 @@ wld.initialize()
 wld.drawAreas()
 
 wld.mm().draw()
-
+#wld.areas[(1,0)].showSegments()
+#wld.areas[(1,1)].showSegments()
+#wld.drawPntsOfArea((-1,0))
+#wld.drawPntsOfArea((0,1))
+#wld.drawPntsOfArea((0,0))
+#wld.drawPntsOfArea((-1,1))
 chars = ['w','a','s','d','c','q',
         'f','x','p','j','m','h']
 funcs = [lambda : wld.move(False,Verti) , lambda : wld.move(False,Hori) , lambda : wld.move(True,Verti) , lambda : wld.move(True,Hori) , lambda : wld.move(True,Diag) , lambda : wld.move(False,Diag) , 

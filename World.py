@@ -50,17 +50,19 @@ class World :
         self.morphs = {}
         
         
-        state = self.canState(_subobject)
+        state = self.canState(_subobject) #newState(self,_subobject,(1,1)) #
+        
         goalstate = self.canState(goalAtom)
         elim =  GoalStateEliminator(goalstate)
         self.molecules = [self.canMolecule(state,elim)]
         self.assCnt = 0
-        self.implications = []                
+        self.implications = []   
+        self.drawimplications = {False : [] , True : []}             
         self.drawingConstraints = {}
         #self.focus = 0
         self.helper = stdHelper + helper
         
-        
+    
 
     def existsCompMorphs(self,s,t)  -> bool :
         sout = self.out(*s)
@@ -125,13 +127,24 @@ class World :
         xs = min ([x for (x,y) in kwargs]) #kwargs[::2]
         ys =min ([y for (x,y) in kwargs]) #kwargs[1::2]
         return (xs,ys)
-    def applyAss(self) :
+    def applyAss(self,soft=True,onlyMonos=True) : # if soft is false this uses drawing constraints to refine the currect mm 
         s = self.mm().subobject().atom
         u = self.mm().uncertainty().atom
+        print(s,u)
         bs = []
         bu = []
         #print("checking asses")
-        for i in self.implications : 
+        impl = self.implications + self.drawimplications[True] + self.drawimplications[False] #todo
+        if (not soft) : 
+            impl = self.drawimplications[True]
+            if not onlyMonos : 
+                print("adding epis")
+                impl += self.drawimplications[False]
+        print("onlyMonos",onlyMonos,len(impl))
+        for i in impl :
+            (a,b) = i
+            print(str(a) , "->" , str(b))
+        for i in impl : 
             #print(i)
             (a,b) = i
             
@@ -142,19 +155,29 @@ class World :
             if (b.isKernel(self) and a.isKernel(self))  and a.isBiggerThan(u) and Helper.UseUncertaintyForAssumption in self.helper :
                 #print("lol")
                 bu.append(b)
-        if (self.assCnt < len(bs + bu)) :
+        #print(len(bs),len(bu))
+        if (self.assCnt < len(bs + bu) ) :
             l = len(bs)
-            if (self.assCnt < l) :        
-                self.mm().updateStateFromSubobj(bs[self.assCnt])
+          
+            if (self.assCnt < l) :                        
+                    self.mm().updateStateFromSubobj(bs[self.assCnt])      
+                     
             else :
                 print("Updating uncertainty by assumption")
+              
                 self.mm().UP.updateAtom(bu[self.assCnt - l])
-                #self.mm().draw()
+              
+                #self.mm().draw
             self.assCnt += 1
-        else :
-            if self.assCnt > 0 :
-                self.assCnt = 0
-                self.applyAss()
+            if (not soft and self.assCnt < len(bs + bu)) : 
+                #print("next round")
+                self.applyAss(soft)     
+        
+        else :            
+                if soft and self.assCnt > 0 :
+                    self.assCnt = 0
+                    self.applyAss()
+
     def exactList(self,room)                : 
         el = self.areas[room].exactList()
         dele = []
@@ -191,16 +214,17 @@ class World :
         epis = [ value for key, value in self.morphs.items() if value.prop== Morphism.Epi]
         monos = [value for key, value in self.morphs.items() if value.prop == Morphism.Mono]
         for e in epis :
-            self.implications.append((FullOrZeroAtom(e.subobject().room, Full) , e.subobject()))
+            self.drawimplications[False].append((FullOrZeroAtom(e.subobject().room, Full) , e.subobject()))
         for m in monos : 
-            self.implications.append(( m.subobject() , FullOrZeroAtom(m.subobject().room, Zero) ))
+            self.drawimplications[True].append(( m.subobject() , FullOrZeroAtom(m.subobject().room, Zero) ))
           
     def subobjectAtom(self) :
         return self.mm().subobject().atom
     def move(self,forward,d) :
+        
         self.mm().move(forward,d)
         self.assCnt = 0
-    
+        
     def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False, extra = [],drawPnts=False) :
         drawingConstraints = None
         d = self.getMdir(xs,ys,xt,yt)
@@ -281,9 +305,17 @@ class World :
         #print("create coker" , x2 , y2 , x1 , y1)
         return self.areas[(x2,y2)].compQuotient(self.createImg(x2,y2,x1,y1))
     def createImg(self,x2,y2,x1,y1,unc=False):
+        
         ax = self.areas[(x1,y1)]
         ay =self.areas[(x2,y2)]
         d = self.getDir(x1,y1,x2,y2)
+        if len(d) > 1 :
+            if (x1+1,y1) in self.drawingConstraints.keys() :
+                d = d[1]
+            elif (x1,y1+1) in self.drawingConstraints.keys() :
+                d = d [0]
+        
+        # how to draw the img of a diagonal map, where the horizontal map is an explicit embedding?
         #print(x1,y1,x2,y2,d)
         segs = ax.findAllSegments(d)
         
@@ -298,9 +330,10 @@ class World :
                 sidx -= 1
                 abort = True
             
+        #print(tidx,segs[tidx])
         while (not (Bsc.inList(segs[tidx].trg() , ay.getPoints() , Bsc.comPnts))) :
             tidx -=1
-            if (tidx == 0 ) : 
+            if (tidx <= 0 ) : 
                     raise Exception("tidx Error!")
                     break 
         
@@ -339,13 +372,26 @@ class World :
                 img.stealSegment(s)
                     
             return img        
-    def createker(self,x1,y1,x2,y2,unc = False):
+    def drawPntsOfArea(self,key) :
+        self.areas[key].drawPnts = True
+        self.areas[key].drawPoints()
+    def isKernelZero(self,x1,y1,x2,y2) :
         b = False
         if (x1,y1) in self.drawingConstraints.keys() :
             if self.drawingConstraints[(x1,y1)] == Atom.Atom((x2,y2) , self.getMdir(x1,y1,y2,y2) , Ker) :
-                b = True
-
-        if (x1,y1) == (x2,y2) or b :
+                #print("createker",x1,y1,x2,y2,"solved by drawingCons")
+                b = True        
+        return (x1,y1) == (x2,y2) or b 
+    def isZero(self, s : Atom) :
+        return (s.info == Zero) or (s.info == Ker and self.isKernelZero(*s.room,*s.getCoRoom()))
+    def refineMM(self,onlyMonos) :
+        #iszero = self.isZero(self.mm().subob)
+        #if iszero : return Atom.FullOrZeroAtom(s.room,"Zero")
+        self.applyAss(False,onlyMonos)
+        
+    def createker(self,x1,y1,x2,y2,unc = False):
+        
+        if self.isKernelZero(x1,y1,x2,y2) :
            a = self.areas[(x1,y1)]
            zero = Area.Area(self.canvas,"black", a.w * 0.1,a.width,a.height )
            for s in a.segments :
@@ -386,9 +432,10 @@ class World :
     
     def drawAreas(self) :
         for coords in self.areas.keys() :
+            #if (coords in [(-1,0),(0,1)]):
             #print("drawing", coords,len(self.areas[coords].segments))
            
-            self.areas[coords].drawSegments()
+                self.areas[coords].drawSegments()
     def genMor(self,s,t,p) :
         #print("generate" ,s , "-",  p , "->"  , t )
 
@@ -404,12 +451,12 @@ class World :
             curveDR = False
             curveUL = False
             #print(coords,o,i)
-            if len(o) >= 2 :
+            if len(o) >= 2 and False : #todo
                 t = self.maximum(o)
                 
                 curveDR = not (any(map(lambda s : self.genMor(s,t,Morphism.Epi).inList(self.morphs.values()) , o)))
                 
-            if len(i) >= 2 :
+            if len(i) >= 2 and False :
                 s = self.minimum(i)
                 #print("lol",s)
                 curveUL = not (any(map(lambda t : self.genMor(s,t,Morphism.Mono).inList(self.morphs.values()), i)))

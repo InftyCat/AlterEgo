@@ -22,12 +22,12 @@ class Particle :
         self.genus = _genus
         self.goalstate = _goalstate
         self.frozen = False
-        self.wld = _molecule.wld
+        self.wld = _molecule.wld 
         self.history = []
         e(_molecule, Molecule.Molecule)
         self.molecule = _molecule
         self.area = None #self.initArea()
-        self.genusSwapped = False
+        
         self.originalGenus = _genus
         self.drawAsMovingUnc = (_genus == Genus.Unc)
         
@@ -47,7 +47,7 @@ class Particle :
         #self.molecule.initState()
         self.molecule.jumpable = True
     def isGenusSwapped(self) :
-        return self.genus == self.originalGenus
+        return self.genus != self.originalGenus
     def activateTimejump(self) :
          if (not self.molecule.jumpable) :                     
                oldcoparticle = self.getCoParticle()
@@ -66,7 +66,7 @@ class Particle :
              print("sth fishy")
     
     def freezePseudoUnc(self) :
-        #print("now freezing pseudounc...")
+        print("now freezing pseudounc...")
         self.drawAsMovingUnc = False
     def printHistory(self) : 
         s = ""
@@ -86,7 +86,7 @@ class Particle :
             h = self.history[-1]
             self.history = self.history [:-1]
             self.updateAtom(h,jumpback=True)
-            self.pseudoMove()
+            if self.isGenusSwapped() : self.pseudoMove()
             #self.draw
 
 
@@ -116,13 +116,12 @@ class Particle :
     def erase(self) : 
         if self.area != None :
             self.area.eraseSegments()
-    def updateAtom(self,_atom : Atom,jumpback=False) :
-        
+    def updateAtom(self,_atom : Atom,jumpback=False) :                
         if (not jumpback) : 
             self.history.append(self.atom)
+        self.atom = _atom     
 
         self.erase()
-        self.atom = _atom 
     
     def getRoom(self) :
         return self.atom.room
@@ -153,7 +152,7 @@ class Particle :
             print("sth went wrong")"""
         print("Now frozen: ", self)
         return el
-
+    
     def getUncCoRoom(self) : 
         return self.atom.getKernelRoom(self.genus == Genus.Unc)
     
