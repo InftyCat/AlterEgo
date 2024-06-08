@@ -27,12 +27,18 @@ class Particle :
         e(_molecule, Molecule.Molecule)
         self.molecule = _molecule
         self.area = None #self.initArea()
+        self.genusSwapped = False
+        self.originalGenus = _genus
+        self.drawAsMovingUnc = (_genus == Genus.Unc)
         
         #print("I was born as particle " + str(id(self)))
         #self.coparticle= 
         
             
-        
+    def drawSegsandMp(self) :
+        if not self.drawAsMovingUnc :
+            self.area.drawSegments()
+            self.area.drawMiddlepoint()
     def generateMoleculeFromSub(self,eliminator) :
         _state = self.wld.canState(self.atom)    
         self.molecule = self.wld.canMolecule2(lambda x : self , _state.uncertainty,eliminator)
@@ -40,33 +46,47 @@ class Particle :
         self.molecule.UP.initArea()
         #self.molecule.initState()
         self.molecule.jumpable = True
-        
+    def isGenusSwapped(self) :
+        return self.genus == self.originalGenus
     def activateTimejump(self) :
          if (not self.molecule.jumpable) :                     
                oldcoparticle = self.getCoParticle()
                #self.history.append(self.atom)
                eliminator = oldcoparticle.freeze()
                eliminator.setNewHistory(self.history + [self.atom],oldcoparticle.history)
+               print("freezing complete , adding molecule")        
                self.genus = Genus.Sub
-               print("freezing complete , adding molecule")
+               if (self.isGenusSwapped()) : 
+                    print("swap genus")                    
+                    #self.pseudoMove()
+                         
                self.generateMoleculeFromSub(eliminator) 
-               print(self.genus , " now jumpable!") # with history ") # , self.history)               
+               print(self.originalGenus , " now jumpable!") # with history ") # , self.history)               
          else :
              print("sth fishy")
     
-    
+    def freezePseudoUnc(self) :
+        #print("now freezing pseudounc...")
+        self.drawAsMovingUnc = False
     def printHistory(self) : 
         s = ""
         for a in self.history : 
             s += str(a) + ","
         return s
+    def pseudoMove(self) :
+            #print("now pseudomovement")
+            self.drawAsMovingUnc = True
+            self.wld.uncPart.tk.after(3000,self.freezePseudoUnc)    
+            
     def jumpback(self) :
+        #print("jumpback", self.genus)
         if (len(self.history)==0) : 
             print(self , " : I have no history!")
         else :
             h = self.history[-1]
             self.history = self.history [:-1]
             self.updateAtom(h,jumpback=True)
+            self.pseudoMove()
             #self.draw
 
 
@@ -103,7 +123,7 @@ class Particle :
 
         self.erase()
         self.atom = _atom 
-
+    
     def getRoom(self) :
         return self.atom.room
     def initArea(self) :      
@@ -121,7 +141,7 @@ class Particle :
         else :"""
         return self.goalstate
     def freeze (self ) :
-        #todo
+    
         self.frozen = True
         self.wld.molecules.remove(self.molecule)
         

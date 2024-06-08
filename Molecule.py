@@ -51,8 +51,9 @@ class Molecule :
             
         else :           
             p =  self.getParticleFromGenus(self.focus)
-         
+            print("->",p.genus)
             eliminator = p.activateTimejump()
+          
 
     def move(self,forward,d) : #todo
         self.jumpable = False
@@ -61,6 +62,7 @@ class Molecule :
         if hasMoved :
         # think of erasing subobjects if uncertainty is full
             self.updateUncFromSubObj()
+            self.wld.uncPart.removePart(self.subobject())
             self.draw()
     def room(self) :
         return self.SP.atom.room
@@ -178,7 +180,7 @@ class Molecule :
         ret = b1 and b2
         #print(self , " > " , other , " = " , b1 , " & " , b2 , " = " , ret)
         return b1 and b2
-    def drawAtom(self) :
-        self.subobject().area.drawSegments() 
-        self.subobject().area.drawMiddlepoint()
+    def drawAtom(self) :        
+        self.subobject().drawSegsandMp()
+        
     

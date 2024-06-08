@@ -16,7 +16,7 @@ sys.path.append("./anaconda3/lib/python3.9/site-packages")
 from shapely.geometry import Point, Polygon
 
 class Area : 
-     def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, ordinary = True)  :
+     def __init__ (self,_canvas,_c : str,_w : int ,_width : int =None, _height : int =None,_exactHori = True,_filled =False, ordinary = True, drawPnts = False)  :
          self.canvas = _canvas
          self.w = _w
          self.c = _c
@@ -32,11 +32,16 @@ class Area :
          self.x = None
          self.y = None
          self.ordinary = ordinary
+         self.drawPnts = drawPnts
      def addSub(self, d, frac) :
+         if (frac > 1 / 2) : 
+             self.oversizeFrac = True
+             frac = 1 - frac
          if (d == Atom.Hori) :
              self.leftFrac = frac
              self.initRightFrac()
          else : 
+             raise ("add verti sub")
              self.upFrac = frac
              self.downFrac = 1 - frac
      def addQuot(self,d,frac) :
@@ -119,9 +124,9 @@ class Area :
          return p
      def drawPoints(self) : 
          for seg in self.segments :
-             r = 25
+             r = 30
              if (seg == self.segments[0]) :
-                 r = 30
+                 r = 50
              self.canvas.create_circle_arc(seg.x1,seg.y1,r,start = 0,end = 359,fill=self.c)
      def showSegments(self) :
         st = ""
@@ -212,24 +217,25 @@ class Area :
         
          comp = Area(self.canvas,c,w )
          i = 0
-         #print("sub:")
-         #sub.showSegments()
-         #print("____________\n self:")
-         #self.showSegments()
+         """print("sub:")
+         sub.showSegments()
+         print("____________\n self:")
+         self.showSegments()"""
          #for s in sub.segments : print(s) 
          #for s in self.segments : print(s) 
          idx = sub.getSegIdxByTrg(self.segments[i].trg())
          #
-         #print(idx)
          
+         #print("checking now" , self.segments[i] , "has" , idx)
          while (idx != -1) :       # finding first self-segment not contained in sub                  
              i += 1
              idx = sub.getSegIdxByTrg(self.segments[i].trg())
          #print("erstes self-segment not contained in sub hat idx" , i)
-         comp.stealSegment(self.segments[i])
+         #print("segments before critical")
+         #comp.showSegments()
          while (idx == -1) :
+             comp.stealSegment(self.segments[i]) #maybe put this before while
              
-             comp.stealSegment(self.segments[i])
              i += 1
              idx = sub.getSegIdxByTrg(self.segments[i].src())
           #   print("i,idx",i,idx)
@@ -241,7 +247,7 @@ class Area :
          #print("j,idx",j,idx)
          #j = self.getSegIdxBySrc(quot.segments[idx].src())
          idx -= 1
-            
+         
          while (j == -1) :
             
             comp.stealSegment(sub.segments[idx].invert()) 
@@ -255,7 +261,9 @@ class Area :
          
         # for i in range(j,len(self.segments)) :             
         #        comp.stealSegment(self.segments[i])
-                
+         """print("final coker:")
+         comp.showSegments()
+         print("_____")"""
          return comp
         
      def comp (self, quot,unc=False) :
@@ -333,8 +341,12 @@ class Area :
         self.initRightFrac()
         self.downFrac = 1 - self.upFrac
      def initialize(self,x,y,width,height,arcs) : # width height werden nochmal übergeben, wegen width changes.
-      # this function draws the segments starting from leftFrac and upFrac.
+      # this function dra
+      # ws the segments starting from leftFrac and upFrac.
+       
+       # print("start init")
         _min= min(width,height)
+        #print(_min == height)
         if (self.leftFrac == 0) :
             _min = height
         if (self.upFrac == 0) :
@@ -359,6 +371,7 @@ class Area :
             st = "line"
         self.createArc(x + width , y + height - _min * upFrac2 , x +width - _min * leftFrac2 , y+ height,st)
         self.create_segments("line",x +width - _min * leftFrac2 , y+ height, x + _min * self.leftFrac , y+ height,x,y+height)
+        #In the previous line there is an issuefor subobjects because _min is not height, so 2 interior nodes on the vertical axes are produced.
         if ("SW" in arcs) : 
             st = "DR" 
         else :
@@ -370,10 +383,24 @@ class Area :
             st = "UL"
         else:
             st = "line"
+        #print("segments before critical",leftFrac2)
+        #self.showSegments()
         
-        self.createArc( x ,y + _min * self.upFrac,x + _min * self.leftFrac,y,st)
-        self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
-        #self.drawPoints()
+        #print("upf",self.upFrac)
+        if (self.leftFrac <= 1/2 ) : #new 
+            self.createArc( x ,y + _min * self.upFrac,x + _min * self.leftFrac,y,st)
+            self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
+        else :
+            
+            #print(x ,y + _min * self.upFrac,x + _min * self.leftFrac,y)
+            #print(x + _min * self.leftFrac,y,x + width - _min*leftFrac2)
+            #self.create_segments("line", x ,y + _min * self.upFrac,x,y)
+            #self.create_segments("line",x,y,x + _min * self.leftFrac,y)
+            #self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
+            self.createArc( x ,y + _min * self.upFrac,x + width - _min*leftFrac2,y,st)
+            #self.create_segments("line",x + _min * self.leftFrac,y,x + width - _min*leftFrac2,y)
+            
+        if self.drawPnts : self.drawPoints()
 
 
 def isSpecialArc(style,x1,y1,x2,y2):
@@ -433,17 +460,21 @@ def _create_circle_arcUL(self, x, y, r, **kwargs):
 
 
 class SubArea(Area) :
-    def __init__(self,_superArea : Area,_d,_frac,_canvas,_c,_w,_exactHori = True,_filled =False) :
+    def __init__(self,_superArea : Area,_d,_frac,_canvas,_c,_w,_exactHori = True,_filled =False,drawPnts = False) :
         self.superArea = _superArea
         self.d = _d
         self.frac = _frac
-        super().__init__(_canvas,_c,_w,_exactHori,_filled)
+        super().__init__(_canvas,_c,_w,_exactHori,_filled,drawPnts=drawPnts)
         _superArea.addSub(_d,_frac)
     def subInitialize(self,st) :
         if (self.d == Atom.Hori) : 
             wi = self.superArea.width * self.frac
             hi = self.superArea.height
-            self.leftFrac = 0
+            if (self.frac > 1/2) : 
+                self.leftFrac = 1/2
+                #self.upFrac = 1 / 2
+            else :
+                self.leftFrac = 0
             self.initRightFrac()
         else : 
             wi = self.superArea.width
@@ -451,7 +482,10 @@ class SubArea(Area) :
             self.upFrac = 0
             self.downFrac = 0 #todo?
         #print(wi,hi)
+            
         super().initialize(self.superArea.x,self.superArea.y,wi,hi,st)
+       # print("Before:\n")
+        #self.superArea.showSegments()
         self.superArea.segments = [self.superArea.segments[-1]] + self.superArea.segments[:-1]
         #self.showSegments()
         #todo

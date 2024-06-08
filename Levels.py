@@ -6,7 +6,7 @@ from BasicFunctions import Helper
 import World
 def getSOGOFromMor(dir,src,trg,prop) :
     #wld.getMdir(*src,*trg)
-    print("wts: " , dir, "map " , src , "->", trg, "is" , prop)
+    ("wts: " , dir, "map " , src , "->", trg, "is" , prop)
     if prop == Mono :
         so = Atom.Atom(src,dir,Atom.Ker)
         go = Atom.FullOrZeroAtom(src,Atom.Zero)
@@ -122,29 +122,36 @@ def nineSurj(canvas) :
     add3x3ToWld(wld)
     return wld
 def snakeConstruction(canvas) :
-    so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker) #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
-    go =   Atom.FullOrZeroAtom((0,2),"Full") #Atom.Atom((0,2) , Atom.Verti, Atom.Im) 
-    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) # Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
+    """so =  Atom.Atom((2,0),Atom.Verti,Atom.Ker)
+    go =   Atom.FullOrZeroAtom((0,2),"Full") 
+    """
+    so =   Atom.Atom((1,0) , Atom.Verti, Atom.Ker)
+    go =   Atom.FullOrZeroAtom((1,0),"Full") 
+    #+ Atom.FullOrZeroAtom((3,1),Atom.Zero) #
+    #  Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
     
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
     #wld.mm().UP.updateAtom
-    #wld.addSES()
-    wld.addMorphism(0, 0,1,0, extra=[Atom.Coker])
+    wld.addSES((0,0),Hori,1/3)
+    wld.addSES((0,1),Hori,2/3)
+    
+    wld.addMorphism(0, 0,0, 1) #, extra=[Atom.Coker])
+    wld.addMorphism(1, 0,1,1)
+    #wld.addMorphism(-1,0,-1,1,extra=[Atom.Coker])
+    
+
+    
+    #wld.addMorphism(2,0,2,1)
+
+    #wld.addMorphism(0, 0,1,0, extra=[Atom.Coker])
     
     
 
     #wld.addArea(x, y)
-    wld.addMorphism(1, 0,1,1)
     #wld.addMorphism(0,1,1,1,Mono)
-    wld.addMorphism(1,1,2,1,extra=[Atom.Ker])
-    wld.addMorphism(0, 0,0, 1, extra=[Atom.Coker])
-
-    
-    wld.addMorphism(2,0,2,1)
-
-    
+    #wld.addMorphism(1,1,2,1,extra=[Atom.Ker])
     
     
     return wld
@@ -175,13 +182,24 @@ def obj(canvas) :
     wld.addArea(0,0)
     wld.addArea(1,0)
     return wld
+def mama(canvas) : 
+    so = Atom.FullOrZeroAtom((1,1),"Full")
+    go = Atom.Atom((1,1) , Atom.Verti, Atom.Im)
+    wld = World.World(canvas, so , go )
+
+    wld.addMorphism(0, 0,1, 0 )#,extra = [Atom.Coker] ) 
+    wld.addMorphism(1,0,1,1)
+    wld.addMorphism(0,0,1,1,prop=Epi)
+    return wld
+#def papa(canvas) :
+    #so =
 def arrow(canvas) :
     so =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,-1),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
-    go =  Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
+    go =  Atom.FullOrZeroAtom((0,1),"Full") #Atom.Atom((0,1) , Atom.Verti, Atom.Im)  #  Atom.FullOrZeroAtom((0,1),"Full") #
 
     helper = [Helper.UseUncertaintyForAssumption]
     wld = World.World(canvas, so , go , helper)
-    wld.addMorphism(0, 0,0, 1 ) #,extra = [Atom.Ker] 
+    wld.addMorphism(0, 0,0, 1 )#,extra = [Atom.Coker] ) 
      
     
     return wld
@@ -190,8 +208,31 @@ def ses(canvas) :
     so =  Atom.FullOrZeroAtom((-1,0),"Full") # Atom.Atom((1,0) , Atom.Hori, Atom.Im)  #
     go =  Atom.FullOrZeroAtom((0,0),"Full") #Atom.Atom((0,0),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
     wld = World.World(canvas, so , go)
-    #wld.addArea(0,0)
-    #wld.addSubArea((0,0),(-1,0),Hori,1/3)
+    
+    #wld.addArea(0,0,drawPnts=True)
+    
+    #wld.addSubArea((0,0),(-1,0),Hori,2/3,drawPnts=True)
+    #wld.addCokernel(*(-1,0),*(0,0))
    # wld.addMorphism(-1,0,0,0,prop=Mono)
-    wld.addSES((0,0),Hori,1/3)
+    #wld.addSES((0,0),Hori,1/3)
+    
+    wld.addSES((0,0),Hori,2/3)
+    
+    #wld.addMorphism(0,0,0,1)
+    #wld.addMorphism(-1,0,-1,1)
+    return wld
+def principle(canvas) : 
+    so =  Atom.FullOrZeroAtom((0,1),"Full") #Atom.Atom((0,-1),Atom.Verti,Atom.Ker) #Atom.FullOrZeroAtom((0,1),"Full") #  #Atom.FullOrZeroAtom((2,1),"Full")  #Atom.Atom((1,1),Atom.Hori,Atom.Ker) #   
+    go =  Atom.Atom((0,2) , Atom.Hori, Atom.Ker)
+
+    helper = [Helper.UseUncertaintyForAssumption]
+    wld = World.World(canvas, so , go , helper)
+    wld.addMorphism(0, 0,0, 1 )#,extra = [Atom.Coker] ) 
+    wld.addMorphism(0,0,1,1,prop=Epi)
+    wld.addMorphism(0, 1,0, 2 )#,extra = [Atom.Coker] ) 
+    wld.addMorphism(0, 1,1, 1 )#,extra = [Atom.Coker] ) 
+    wld.addMorphism(0, 2,1, 2 )#,extra = [Atom.Coker] ) 
+    wld.addMorphism(1,1,1, 2 )#,extra = [Atom.Coker] ) 
+     
+    
     return wld

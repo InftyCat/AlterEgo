@@ -20,8 +20,8 @@ from Molecule import *
 from MovingUnc import MovingUnc
 
 from Room import *
-stdWidth = 400
-stdHeight = 400
+stdWidth = 500
+stdHeight = 500
 originX = 200
 originY = 100
 
@@ -70,7 +70,7 @@ class World :
             return False
         else :            
             return any (map (lambda s2 : self.existsCompMorphs(s2,t), sout))
-    def addArea(self,x,y,width=stdWidth,height=stdHeight,exactHori=True,c=None) :
+    def addArea(self,x,y,width=stdWidth,height=stdHeight,exactHori=True,c=None,drawPnts = False) :
         #(x,y) = atom.room
         
         if (c == None) :
@@ -80,12 +80,13 @@ class World :
             #print(x,y,c)
             #print("addArea" , x,y)
             #print(getWidth(x, y))
-            self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),width,height,exactHori) #[(x,y)] = c #[x].append(a)
-    def addSubArea(self,room,subRoom,d,frac,c=None) :
+            self.areas[(x,y)] = Area.Area(self.canvas,c,Bsc.getWidth(x,y),width,height,exactHori,drawPnts=drawPnts) #[(x,y)] = c #[x].append(a)
+    def addSubArea(self,room,subRoom,d,frac,c=None,drawPnts=False) :
         if (c == None) :
             c = Bsc.get_random_color()
-        self.areas[subRoom] =Area.SubArea(self.areas[room],d,frac,self.canvas,c,Bsc.getWidth(*room),True)
+        self.areas[subRoom] =Area.SubArea(self.areas[room],d,frac,self.canvas,c,Bsc.getWidth(*room),True,drawPnts = drawPnts)
         self.drawingConstraints[(subRoom)] = (Atom.Atom(room , d ,  Ker) )
+        self.addMorphism(*subRoom,*room,prop=Morphism.Mono)
     def addSES(self,room,d,frac,c=None) :
        if not (room in self.areas.keys()) : 
            if d == Hori : 
@@ -94,10 +95,11 @@ class World :
            else :
                wi = stdWidth
                he = stdHeight #* 1.5
-           self.addArea(*room,width=wi,height=he)
+           self.addArea(*room,width=wi,height=he,drawPnts=False)
+           
        subRoom = Atom.Atom(room, d,Im).getCoRoom()  
-       self.addSubArea(room,subRoom,d,frac,c)
-       self.addMorphism(*subRoom,*room,prop=Morphism.Mono,extra = [Coker])
+       self.addSubArea(room,subRoom,d,frac,c,drawPnts=False)
+       self.addCokernel(*subRoom,*room,drawPnts=True)
 
 
        #TODO
@@ -165,17 +167,17 @@ class World :
         for d in dele : 
             el.remove(d)
         return el
-    def addCokernel(self ,x1, y1 ,x2 , y2) : 
+    def addCokernel(self ,x1, y1 ,x2 , y2,drawPnts=False) : 
         """(x1,y1) = src
         (x2,y2) = trg"""
         #,y1,x2,y2)
         newpos = (2 * x2 - x1 , 2 * y2 - y1)
         
 
-        self.addMorphism(x2,y2,*newpos,prop = Morphism.Epi,drawProp=True)
-    def addKernel(self,x1,y1,x2,y2) :
+        self.addMorphism(x2,y2,*newpos,prop = Morphism.Epi,drawProp=True,drawPnts=drawPnts)
+    def addKernel(self,x1,y1,x2,y2,drawPnts=False) :
         newPos = (2 * x1 - x2 , 2 * y1 - y2)
-        self.addMorphism(*newPos,x1,y1,prop= Morphism.Mono , drawProp=True)
+        self.addMorphism(*newPos,x1,y1,prop= Morphism.Mono , drawProp=True,drawPnts=drawPnts)
     def printMMHistory(self) :
         print(self.mm().getHistory())
     def getMMIndex(self) : 
@@ -199,7 +201,7 @@ class World :
         self.mm().move(forward,d)
         self.assCnt = 0
     
-    def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False, extra = []) :
+    def addMorphism(self,xs,ys,xt,yt,prop="",specialDir = "",drawProp = False, extra = [],drawPnts=False) :
         drawingConstraints = None
         d = self.getMdir(xs,ys,xt,yt)
        
@@ -209,21 +211,21 @@ class World :
         
         if (prop != "") : 
             print(prop , (xs,ys) , (xt,yt))
-        self.addArea(xs,ys)
+        self.addArea(xs,ys,drawPnts=drawPnts)
         if (drawProp) : 
             if prop == Morphism.Epi :
                 trg = Atom.Atom((xs,ys) , d, Coker)
                 #print("drawConstr : " , trg)
                 self.drawingConstraints[xt,yt] = trg           
                 #drawingConstraints = Atom.Atom(d)
-        self.addArea(xt,yt)        
+        self.addArea(xt,yt,drawPnts=drawPnts)        
 
         self.morphs[(xs,ys,xt,yt)] = self.genMor((xs,ys),(xt,yt) ,  prop)
         if Coker in extra : 
             #print("adding cokernel")
-            self.addCokernel(xs,ys,xt,yt)
+            self.addCokernel(xs,ys,xt,yt,drawPnts=drawPnts)
         if Ker in extra :
-            self.addKernel(xs,ys,xt,yt)
+            self.addKernel(xs,ys,xt,yt,drawPnts=drawPnts)
     def swapFocus(self) :
         self.mm().swapFocus()
         print("swapping focus to" , self.mm().focus)
@@ -446,8 +448,9 @@ class World :
                         dC = self.drawingConstraints[coords]
                     
                         self.areas[coords] = dC.getArea(self)
+
                         #print(self.areas[coords].getPoints())
-#                    self.areas[coords].drawPoints()
+                        
                     #self.areas[coords].initialize()
                 #print("adding area by constraint: " , self.drawingConstraints[coords])
             else :
@@ -471,6 +474,7 @@ class World :
                     self.areas[coords].initialize(originX + insWidth -  w / 2 * (x +y),
                             originY + insHeight -  w / 2* (x + y),
                             a.width +  w  * (x +y)  ,a.height +  w  * (x +y),st)
+            if self.areas[coords].drawPnts : self.areas[coords].drawPoints()
                     #self.areas[coords].drawPoints()
         self.mm().initState() 
         self.morPropToImp()

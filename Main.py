@@ -32,7 +32,7 @@ TODO : manchmal werden UNC nicht angezeigt für subareas. A -> B -> A , + f
 tk = tkr.Tk()
 frame = tkr.Frame(tk)
 frame.grid(row=0, column=0)
-canvas = tkr.Canvas(frame, width=1500, height=800)
+canvas = tkr.Canvas(frame, width=1500, height=1000)
 canvas.grid(row=0,column=0)
 
 
@@ -55,10 +55,10 @@ def createPolygone(self, *args, **kwargs) :
 tkr.Canvas.create_polygonWithAlpha = createPolygone
 #################################################################################################
 
-wld = Levels.viererMono(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  
+wld = Levels.cokernelFactorization(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
+#################################################################################################
 uncPart = MovingUnc(tk,canvas,wld)
 wld.setUncPart(uncPart)
-#################################################################################################
 wld.initialize()
 
 
@@ -100,5 +100,5 @@ def uncertaintyThread() :
 """    
 #t = threading.Thread(target=uncertaintyThread)
 #t.start()
-
+#wld.areas[(0,0)].showSegments()
 tkr.mainloop()
