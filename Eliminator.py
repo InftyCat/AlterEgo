@@ -81,7 +81,7 @@ class FrozenAtomEliminator(Eliminator) :
             super().__init__(compmaxState ,f )
         return
     def setNewHistory(self,sh,uh) :
-         self.newSubHistory = copy.deepcopy(sh )
+         self.newSubHistory = copy.deepcopy(sh )         
          self.newUncHistory = copy.deepcopy(uh )
          print("new history of eliminator : " , sh , " _ " ,uh)
     def getNewHistory(self,gen : Genus) :

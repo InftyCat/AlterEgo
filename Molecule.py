@@ -73,7 +73,9 @@ class Molecule :
         # think of erasing subobjects if uncertainty is full
             self.updateUncFromSubObj()
             self.wld.uncPart.removePart(self.subobject())
+            #print("v",self.uncertainty())
             self.wld.refineMM(True)
+            #print("n",self.uncertainty()) 
             self.draw()
     def room(self) :
         return self.SP.atom.room
@@ -139,7 +141,7 @@ class Molecule :
         self.subobject().initArea()
         self.uncertainty().initArea()
        # print(self.subobject().area)
-        
+        #print("drawing",self)
         self.drawAtom()
         #print("UNC=",self.uncertainty())
 
@@ -148,6 +150,7 @@ class Molecule :
       #self.deleteState()
       #self.state = state
       #print("State  is now" , state)
+      print("update")
       self.SP.updateAtom(state.subobject)
       self.UP.updateAtom(state.uncertainty)
       self.draw()
@@ -162,8 +165,8 @@ class Molecule :
     def updateStateFromSubobj(self,subobject : Atom) :
         self.subobject().updateAtom(subobject)
         self.updateUncFromSubObj()
-
-        self.draw()
+        print("upd st fr so todo")
+        #self.draw() #bpnt
         """r = self.uncertainty().getUncCoRoom()
         r.wedge(subobject.room)
         print(r)

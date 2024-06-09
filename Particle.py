@@ -38,6 +38,7 @@ class Particle :
     def drawSegsandMp(self) :
         if not self.drawAsMovingUnc :
             self.area.drawSegments()
+            #print("draw mp",self.genus)
             self.area.drawMiddlepoint()
     def generateMoleculeFromSub(self,eliminator) :
         _state = self.wld.canState(self.atom)    
@@ -116,17 +117,18 @@ class Particle :
     def erase(self) : 
         if self.area != None :
             self.area.eraseSegments()
+        self.wld.uncPart.removePart(self)            
     def updateAtom(self,_atom : Atom,jumpback=False) :                
         if (not jumpback) : 
             self.history.append(self.atom)
         self.atom = _atom     
-
+        self.getArea()
         self.erase()
     
     def getRoom(self) :
         return self.atom.room
     def initArea(self) :      
-            self.area = self.getArea()
+            self.updateArea()
             if self.genus == Genus.Sub :
                 self.area.filled = True#
                 #leave it as it is otherwise
@@ -155,13 +157,18 @@ class Particle :
     
     def getUncCoRoom(self) : 
         return self.atom.getKernelRoom(self.genus == Genus.Unc)
-    
-    def getArea(self) : #,forRandomPurpose=False) : 
+    def updateArea(self) : 
+             self.area = self.constructArea()
+    def getArea(self) :
+         if (self.area == None) :
+            self.updateArea()
+         return self.area
+    def constructArea(self) : #,forRandomPurpose=False) : 
         
         atom = self.atom
         if self.genus == Genus.Sub : #or forRandomPurpose :
         #atom = self.subobject()
-            return atom.getArea(self.wld) # ,unc=False)
+            return atom.constructArea(self.wld) # ,unc=False)
         elif  self.genus == Genus.Unc :
                    
         #atom = self.uncertainty()

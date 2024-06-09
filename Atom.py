@@ -44,16 +44,18 @@ class Atom:
             exact = wld.exactList(self.room)            
             return ((self.info == Ker or ((d in exact) and self.info == Im)) and self.mdir == d) or self.info == Zero
     def __init__(self , _room , _mdir , _info) : #, _genus = Genus.Sub) :
-        
+        #self.constructedArea = None
         if (_info in [Im, Ker,Coker ,Full,Zero]) :# _mdir in [Verti,Hori,Diag] and 
             self.room = _room
             self.mdir = _mdir
             self.info = _info
+        #self.constructedArea 
         # self.genus = _genus
             
         else :
             print("atom init Error!",_mdir,_info)
-    def getArea(self , wld) : 
+
+    def constructArea(self , wld) : 
             
             (x1,y1) = self.room
             
@@ -76,8 +78,13 @@ class Atom:
             elif self.info == Zero:
                 #print("this code")
                 zero = Area.Area(wld.canvas,"#000000",3,ordinary=False) #,a.width,a.height)
-                zero.area = wld.areas[(x1,y1)].drawAndReturnZeroArea()
+                zero.mpcoords = wld.areas[(x1,y1)].returnZeroAreaMpCoords()
+                #mpOfSuper = wld.areas[(x1,y1)].getMiddlePoint(30)
+                #print("mpofsupper",mpOfSuper)
+                #zero.drawMiddlepoint(mpOfSuper)
+                
                 #for s in wld.areas[(x1,y1)].segments : zero.stealSegment(s)
+                
                 return zero
     def __eq__(self, other):
             if isinstance(other, Atom):

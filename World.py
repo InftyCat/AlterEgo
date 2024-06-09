@@ -130,22 +130,21 @@ class World :
     def applyAss(self,soft=True,onlyMonos=True) : # if soft is false this uses drawing constraints to refine the currect mm 
         s = self.mm().subobject().atom
         u = self.mm().uncertainty().atom
-        print(s,u)
+        #print(s,u)
         bs = []
         bu = []
         #print("checking asses")
         impl = self.implications #+ self.drawimplications[True] + self.drawimplications[False] #todo
+        
         if (not soft) : 
             impl = self.drawimplications[True]
             if not onlyMonos : 
                 #print("adding epis")
-                impl += self.drawimplications[False]
-        #print("onlyMonos",onlyMonos,len(impl))
-        if (s.info == "Zero") : 
-            return
-        for i in impl :
-            (a,b) = i
-            #print(str(a) , "->" , str(b))
+                impl = impl + self.drawimplications[False]
+        
+         #if (s.info == "Zero") : 
+        #    return
+      
         for i in impl : 
             #print(i)
             (a,b) = i
@@ -158,6 +157,11 @@ class World :
                 #print("lol")
                 bu.append(b)
         #print(len(bs),len(bu))
+        for s in bs :
+            
+            print("bs:" , str(s))
+        for u in bu : 
+             print(str(u))
         if (self.assCnt < len(bs + bu) ) :
             l = len(bs)
           
@@ -221,7 +225,7 @@ class World :
             self.drawimplications[False].append((FullOrZeroAtom(e.subobject().room, Full) , e.subobject()))
         for m in monos : 
             self.drawimplications[True].append(( m.subobject() , FullOrZeroAtom(m.subobject().room, Zero) ))
-          
+        
     def subobjectAtom(self) :
         return self.mm().subobject().atom
     def move(self,forward,d) :
@@ -498,7 +502,7 @@ class World :
                     else :
                         dC = self.drawingConstraints[coords]
                     
-                        self.areas[coords] = dC.getArea(self)
+                        self.areas[coords] = dC.constructArea(self)
 
                         #print(self.areas[coords].getPoints())
                         

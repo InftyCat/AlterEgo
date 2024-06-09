@@ -33,6 +33,7 @@ class Area :
          self.y = None
          self.ordinary = ordinary
          self.drawPnts = drawPnts
+         self.mpcoords = None
      def addSub(self, d, frac) :
          if (frac > 1 / 2) : 
              self.oversizeFrac = True
@@ -51,7 +52,8 @@ class Area :
      def addQuot(self,d,frac) :
          return
          #todo #if (d == Atom.Hori) : 
-             
+     def addSegment(self, seg)  : 
+         self.segments.append(seg)
      def create_segments (self,style, *kwargs,glue=False):
         #print(kwargs,len(kwargs))
         segs = [[kwargs[i], kwargs[i+1],kwargs[i+2],kwargs[i+3]] for i in range(0, len(kwargs)-2, 2)]
@@ -67,7 +69,7 @@ class Area :
                     if (len(self.segments) > 0) : 
                         if not Bsc.comPnts(self.segments[-1].trg() , (segs[i][0] , segs[i][1])) :
                             print("seg append didnt fit")
-                    self.segments.append(Segment.Segment(self.canvas,*segs[i],_style=style,_w = self.w,_c = self.c,_glue=glue)) #,_dir = direct[i]) )
+                    self.addSegment(Segment.Segment(self.canvas,*segs[i],_style=style,_w = self.w,_c = self.c,_glue=glue)) #,_dir = direct[i]) )
      def stealSegment (self,seg) :
         if (isinstance(self,SubArea)) : 
             raise ("well")
@@ -168,23 +170,42 @@ class Area :
          x = (x1 + x2) /2 + offSet
          y = (y1 + y2) /2 + offSet
          return (x,y)
-     def drawAndReturnZeroArea(self) :
-         return self.canvas.create_circle_arc(*self.getMiddlePoint(30),20,start = 0,end = 359)
-     def drawMiddlepoint(self) :
-         if self.ordinary :
-            self.mp = self.canvas.create_circle_arc(*self.getMiddlePoint(),20,start = 0,end = 359,fill=self.c)
+     def returnZeroAreaMpCoords(self) :
+         return self.getMiddlePoint(30) # self.canvas.create_circle_arc(*self.getMiddlePoint(30),20,start = 0,end = 359)
+     def drawMiddlepoint(self) : #,mp = False) :
+        if self.mpcoords == None :
+            self.mpcoords = self.getMiddlePoint()
+            
+        # print(self.ordinary,mp)
+        # if mp !=False :
+        #     mp2 = mp
+        # else :
+        #     mp2 = self.getMiddlePoint()
+        if (self.mp == None) :
+            if self.ordinary : #or mp != False :
+                    #print("draw ordinary mp")
+                    
+                    self.mp = self.canvas.create_circle_arc(*self.mpcoords,20,start = 0,end = 359,fill=self.c)
+            else :
+                    #print("drawing mp")
+                    self.mp = self.canvas.create_circle_arc(*self.mpcoords,20,start = 0,end = 359)
+
+        
          #self.mp = self.canvas.create_circle_arc(x2,y2,20,start = 0,end = 359,fill="blue")
      def eraseSegments(self) :
-         
+         #print("erasing Segs")
          for seg in self.segments :
          
              seg.erase()    
          if (self.mp != None) :
              self.canvas.delete(self.mp)
+             #print("delete mp")
          if (self.filled) :
              self.canvas.delete(self.fillArea)
-         if (not self.ordinary) :
-             self.canvas.delete(self.area)
+         
+        #  if (not self.ordinary) :
+        #      print("not ordinary hence delete") #todo
+        #      self.canvas.delete(self.mp)
 
          self.segments = []
          self.canvas.update()

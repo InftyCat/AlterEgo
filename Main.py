@@ -55,7 +55,7 @@ def createPolygone(self, *args, **kwargs) :
 tkr.Canvas.create_polygonWithAlpha = createPolygone
 #################################################################################################
 
-wld = Levels.monoIntro(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
+wld = Levels.snakeConstruction(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
 #################################################################################################
 uncPart = MovingUnc(tk,canvas,wld)
 wld.setUncPart(uncPart)

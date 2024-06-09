@@ -22,7 +22,7 @@ class MovingUnc :
                             self.canvas.delete(self.uncpnt[unc])
                     if (not self.wld.isZero(unc.atom)) :
                         #print("uncAction", unc)
-                        p = unc.atom.getArea(self.wld).random_Point_in_Polygon()
+                        p = unc.atom.constructArea(self.wld).random_Point_in_Polygon()
 
                         (x,y) = (p.x,p.y)
                         
