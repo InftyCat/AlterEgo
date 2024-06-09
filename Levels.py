@@ -126,7 +126,7 @@ def snakeConstruction(canvas) :
 
     so =   Atom.Atom((1,0) , Atom.Verti, Atom.Ker)  
     #so =    Atom.FullOrZeroAtom((0,0),"Zero")
-    go =   Atom.FullOrZeroAtom((0,2),"Full")  #Atom.FullOrZeroAtom((3,1),Atom.Zero) #
+    go =   Atom.FullOrZeroAtom((-1,2),"Full")  #Atom.FullOrZeroAtom((3,1),Atom.Zero) #
     #+ 
     #  Atom.Atom((3,1) , Atom.Hori, Atom.Ker) #Atom.FullOrZeroAtom((2,0),Atom.Zero)
     
@@ -138,9 +138,9 @@ def snakeConstruction(canvas) :
     wld.addSES((0,0),Hori,1/3)
     wld.addSES((0,1),Hori,2/3)
     
-    wld.addMorphism(0, 0,0, 1) #, extra=[Atom.Coker])
+    wld.addMorphism(0, 0,0, 1)
     wld.addMorphism(1, 0,1,1)
-    wld.addMorphism(-1, 0,-1,1)
+    wld.addMorphism(-1, 0,-1,1, extra=[Atom.Coker])
    
     #wld.addMorphism(-1,0,-1,1,extra=[Atom.Coker])
     

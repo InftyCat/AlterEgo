@@ -32,7 +32,7 @@ TODO : manchmal werden UNC nicht angezeigt für subareas. A -> B -> A , + f
 tk = tkr.Tk()
 frame = tkr.Frame(tk)
 frame.grid(row=0, column=0)
-canvas = tkr.Canvas(frame, width=1500, height=1000)
+canvas = tkr.Canvas(frame, width=800, height=800)
 canvas.grid(row=0,column=0)
 
 
@@ -55,7 +55,7 @@ def createPolygone(self, *args, **kwargs) :
 tkr.Canvas.create_polygonWithAlpha = createPolygone
 #################################################################################################
 
-wld = Levels.snakeConstruction(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
+wld = Levels.monoIntro(canvas) # Levels.viererMono(canvas) #Levels.viererEpi(canvas) #  snakeConstruction
 #################################################################################################
 uncPart = MovingUnc(tk,canvas,wld)
 wld.setUncPart(uncPart)
@@ -67,7 +67,7 @@ wld.drawAreas()
 wld.mm().draw()
 #wld.areas[(1,0)].showSegments()
 #wld.areas[(1,1)].showSegments()
-#wld.drawPntsOfArea((-1,0))
+#wld.drawPntsOfArea((-1,2))
 #wld.drawPntsOfArea((0,1))
 #wld.drawPntsOfArea((0,0))
 #wld.drawPntsOfArea((-1,1))

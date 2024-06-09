@@ -20,9 +20,9 @@ from Molecule import *
 from MovingUnc import MovingUnc
 
 from Room import *
-stdWidth = 500
-stdHeight = 500
-originX = 200
+stdWidth = 400
+stdHeight = 400
+originX = 100
 originY = 100
 
 from enum import Enum
@@ -134,16 +134,18 @@ class World :
         bs = []
         bu = []
         #print("checking asses")
-        impl = self.implications + self.drawimplications[True] + self.drawimplications[False] #todo
+        impl = self.implications #+ self.drawimplications[True] + self.drawimplications[False] #todo
         if (not soft) : 
             impl = self.drawimplications[True]
             if not onlyMonos : 
-                print("adding epis")
+                #print("adding epis")
                 impl += self.drawimplications[False]
-        print("onlyMonos",onlyMonos,len(impl))
+        #print("onlyMonos",onlyMonos,len(impl))
+        if (s.info == "Zero") : 
+            return
         for i in impl :
             (a,b) = i
-            print(str(a) , "->" , str(b))
+            #print(str(a) , "->" , str(b))
         for i in impl : 
             #print(i)
             (a,b) = i
@@ -171,13 +173,15 @@ class World :
             self.assCnt += 1
             if (not soft and self.assCnt < len(bs + bu)) : 
                 #print("next round")
-                self.applyAss(soft)     
-        
+                return self.applyAss(soft)     
+            return True
         else :            
-                if soft and self.assCnt > 0 :
-                    self.assCnt = 0
-                    self.applyAss()
-
+                if soft : 
+                    if self.assCnt > 0 :
+                        self.assCnt = 0
+                        self.applyAss()
+                else : 
+                    return False
     def exactList(self,room)                : 
         el = self.areas[room].exactList()
         dele = []
@@ -387,7 +391,7 @@ class World :
     def refineMM(self,onlyMonos) :
         #iszero = self.isZero(self.mm().subob)
         #if iszero : return Atom.FullOrZeroAtom(s.room,"Zero")
-        self.applyAss(False,onlyMonos)
+        return self.applyAss(False,onlyMonos)
         
     def createker(self,x1,y1,x2,y2,unc = False):
         

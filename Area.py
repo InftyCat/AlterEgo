@@ -41,7 +41,7 @@ class Area :
              self.leftFrac = frac
              self.upFrac = 1/2
              self.downFrac = 1/2
-             print("up,down=1/2")
+             #print("up,down=1/2")
              self.initRightFrac()
              #print("left,right",self.leftFrac,self.rightFrac)
          else : 
